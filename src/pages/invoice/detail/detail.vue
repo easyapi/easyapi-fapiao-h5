@@ -4,6 +4,7 @@
     <div class="invoiced" style="margin-top: 5px">
       <a @click="viewPicture">
         <van-cell :title=" invoiceDetail.category+ '（' + invoiceDetail.statements + '）'" is-link></van-cell>
+        <van-cell v-if="invoiceDetail.auditState" title="未通过原因："><van-tag type="warning">{{invoiceDetail.consoleReason}}</van-tag></van-cell>
       </a>
     </div>
     <div class="page-part invoice-con">
@@ -58,7 +59,7 @@
 </template>
 
 <script>
-  import {getInvoice, getOutOrderList} from "../../../api/invoice";
+  import { getInvoice, getOutOrderList } from "../../../api/invoice";
   import Header from "../../../components/Header.vue";
   import Clipboard from "clipboard";
 
@@ -114,12 +115,12 @@
         });
       },
       getOutOrderList() {
-        console.log(11)
+        console.log(11);
         let params = {
           invoiceId: this.$route.query.id
         };
         getOutOrderList(params).then(res => {
-          this.invoiceDetailItems = res.data.content
+          this.invoiceDetailItems = res.data.content;
         }).catch(error => {
           Toast(error.response.data.message);
         });
@@ -127,17 +128,17 @@
       goAssociatedOrder() {
         this.$router.push({
           path: "/invoice/out-order",
-          query: {id: this.$route.query.id}
+          query: { id: this.$route.query.id }
         });
       },
       copyLink() {
         let _this = this;
         let clipboard = new this.clipboard(".copyPdfUrl");
-        clipboard.on("success", function () {
-          _this.$toast({message: "复制成功", className: "top-toast"});
+        clipboard.on("success", function() {
+          _this.$toast({ message: "复制成功", className: "top-toast" });
         });
-        clipboard.on("error", function () {
-          _this.$toast({message: "复制失败", className: "top-toast"});
+        clipboard.on("error", function() {
+          _this.$toast({ message: "复制失败", className: "top-toast" });
         });
       }
     },
@@ -152,12 +153,16 @@
     },
     mounted() {
       this.getInvoiceDetail();
-      this.getOutOrderList()
+      this.getOutOrderList();
     }
   };
 </script>
 
 <style scoped>
+  .tag {
+    margin-left: 16px;
+  }
+
   .invoiced {
     margin-top: 60px;
   }
