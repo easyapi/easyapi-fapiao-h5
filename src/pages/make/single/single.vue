@@ -68,7 +68,7 @@
       <van-button
         type="info"
         class="submit"
-        @click="goInvoiceSuccess"
+        @click="makeInvoice"
         v-if="showDisabled"
       >提交
       </van-button>
@@ -134,7 +134,7 @@
           addrMobile: "",
           email: "",
           remark: "",
-          price: ""
+          price: 0.0
         }
       };
     },
@@ -167,17 +167,20 @@
           this.calculatedAmount();
         });
       },
-      goInvoiceSuccess() {
+      makeInvoice() {
         if (this.invoiceForm.type === '个人') {
           if (this.invoiceForm.purchaserName == "") {
             return Toast("请输入发票抬头");
           }
         }
+        this.checkEmailMobile()
+        if (!this.ifCheckEmailMobile) {
+          return;
+        }
         Dialog.confirm({
           title: '提示',
           message: '确认抬头和金额正确并申请开票吗？',
         }).then(() => {
-          this.checkEmailMobile();
           this.invoiceForm.addrMobile = this.invoiceForm.addrMobile;
           this.invoiceForm.email = this.email;
           this.invoiceForm.type = this.invoiceForm.type;
@@ -198,22 +201,13 @@
             this.showDisabled = true;
           });
         }).catch(error => {
-
         })
       },
-      //计算发票金额
+      /**  计算发票金额 */
       calculatedAmount() {
         if (this.outOrder !== null) {
           this.amountOfMoney = this.outOrder.price.toFixed(2);
         }
-      },
-      getEtr() {
-        this.invoiceForm.category = "增值税电子普通发票";
-        this.invoiceForm.property = "电子";
-      },
-      getPaper() {
-        this.invoiceForm.property = "纸质";
-        this.invoiceForm.category = "增值税普通发票";
       },
       /** 删除商品 */
       deleteProduct(id) {

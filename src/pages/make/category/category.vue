@@ -66,11 +66,11 @@
 </template>
 
 <script>
-  import { getQiniuToken, getQiniuKey } from "../../../api/qiniu";
-  import { getCustomCategoryList } from "../../../api/custom-category";
-  import { categoryMakeInvoice } from "../../../api/make";
-  import { Toast } from "vant";
-  import { Dialog } from "vant";
+  import {getQiniuToken, getQiniuKey} from "../../../api/qiniu";
+  import {getCustomCategoryList} from "../../../api/custom-category";
+  import {categoryMakeInvoice} from "../../../api/make";
+  import {Toast} from "vant";
+  import {Dialog} from "vant";
   import axios from "axios";
   import Invoice from "../../../components/make/Invoice";
   import Receive from "../../../components/make/Receive";
@@ -103,8 +103,8 @@
           name: ""
         },
         invoiceForm: {
-          category: "增值税电子普通发票",
           property: localStorage.getItem("ifElectronic") === "true" ? "电子" : "纸质",
+          category: "增值税电子普通发票",
           type: "个人",
           purchaserName: "",
           purchaserTaxpayerNumber: "",
@@ -112,7 +112,7 @@
           purchaserPhone: "",
           purchaserBank: "",
           purchaserBankAccount: "",
-          price: null,
+          price: "",
           addrMobile: "",
           email: "",
           remark: "",
@@ -168,9 +168,8 @@
         });
       },
       makeInvoice() {
-        this.checkEmailMobile();
         if (this.invoiceForm.type === "个人") {
-          if (this.invoiceForm.purchaserName == "") {
+          if (this.invoiceForm.purchaserName === "") {
             return Toast("请输入发票抬头");
           } else {
             if (this.customCategory == null || this.customCategory.customCategoryId == null) {
@@ -191,6 +190,10 @@
         if (this.invoiceForm.extends[0].fieldValue === "") {
           return Toast("附件一栏请上传付款记录凭证");
         }
+        this.checkEmailMobile()
+        if (!this.ifCheckEmailMobile) {
+          return;
+        }
         Dialog.confirm({
           title: "提示",
           message: "确认抬头和金额正确并申请开票吗？"
@@ -201,6 +204,8 @@
           });
           this.invoiceForm.customCategoryId = this.customCategory.customCategoryId;
           this.invoiceForm.companyId = this.company.companyId;
+          console.log(this.invoiceForm)
+          return;
           categoryMakeInvoice(this.invoiceForm).then(res => {
             if (res.data.code === 1) {
               Toast.clear();
@@ -231,6 +236,7 @@
       if (localStorage.getItem("type")) {
         this.invoiceForm.type = localStorage.getItem("type");
       }
+      this.invoiceForm.category = this.invoiceForm.property === '电子' ? '增值税电子普通发票' : this.invoiceForm.type === '个人' ? '增值税普通发票' : '增值税专用发票';
     },
     activated() {
     },
@@ -238,6 +244,7 @@
       this.getToken();
       this.getKey()
       this.getCustomCategories();
+      this.loadingList = false;
     }
   };
 </script>

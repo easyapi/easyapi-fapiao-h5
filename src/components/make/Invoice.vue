@@ -4,16 +4,18 @@
       <p>请选择发票类型</p>
       <van-row type="flex" justify="space-between" class="invoice-type">
         <van-col span="12" v-show="ifElectronic ==='true'">
-          <div :class="{'invoice-type_blue_box': invoiceForm.property=='电子', 'invoice-type_gray_box': invoiceForm.property!='电子' }"
-               style="margin-right:5px"
-               @click="changeElectronic">
+          <div
+            :class="{'invoice-type_blue_box': invoiceForm.property=='电子', 'invoice-type_gray_box': invoiceForm.property!='电子' }"
+            style="margin-right:5px"
+            @click="changeElectronic">
             <p style="font-size: 16px; margin-top: -6px">电子发票</p>
             <p style="font-size: 12px; margin-top: 6px">最快1分钟开具</p>
           </div>
         </van-col>
         <van-col span="12" v-show="this.ifPaper ==='true'">
-          <div :class="{'invoice-type_blue_box': invoiceForm.property=='纸质', 'invoice-type_gray_box': invoiceForm.property!='纸质' }"
-               style="margin-left:5px" @click="changePaper">
+          <div
+            :class="{'invoice-type_blue_box': invoiceForm.property=='纸质', 'invoice-type_gray_box': invoiceForm.property!='纸质' }"
+            style="margin-left:5px" @click="changePaper">
             <p style="font-size: 16px; margin-top: -6px">纸质发票</p>
             <p style="font-size: 12px; margin-top: 6px">预计一周送达</p>
           </div>
@@ -22,37 +24,37 @@
     </div>
     <div class="page-part invoice-con">
       <p>发票详情</p>
-      <form action="" id="formBox" ref="childForm" :model="childForm">
+      <form action="" id="formBox" ref="invoiceForm" :model="invoiceForm">
         <van-cell title="抬头类型" center>
-          <van-radio-group class="van-radio-group_type" v-model="childForm.type" direction="horizontal"
+          <van-radio-group class="van-radio-group_type" v-model="invoiceForm.type" direction="horizontal"
                            @change="selectInvoiceType">
             <van-radio name="企业">企业</van-radio>
             <van-radio name="个人">个人/事业单位</van-radio>
           </van-radio-group>
         </van-cell>
         <van-cell title="发票类型" center v-show="invoiceForm.property == '纸质'">
-          <van-radio-group class="van-radio-group_type" v-model="childForm.category" direction="horizontal"
+          <van-radio-group class="van-radio-group_type" v-model="invoiceForm.category" direction="horizontal"
           >
             <van-radio style="margin-bottom: 5px;" name="增值税普通发票">增值税普通发票</van-radio>
             <van-radio name="增值税专用发票" v-if="invoiceForm.type==='企业'">增值税专用发票</van-radio>
           </van-radio-group>
         </van-cell>
         <van-field label="发票抬头" v-if="invoiceForm.type === '个人'" placeholder="请输入姓名/事业单位"
-                   v-model="childForm.purchaserName"/>
+                   v-model="invoiceForm.purchaserName"/>
         <van-field label="发票抬头" readonly v-if="invoiceForm.type === '企业'" @click="gotoCompany"
                    right-icon="arrow"
-                   placeholder="请选择发票抬头" v-model="childCompany.name"/>
-        <van-field label="税号" value="" readonly v-if="invoiceForm.type === '企业'" v-model="childCompany.taxNumber"/>
+                   placeholder="请选择发票抬头" v-model="company.name"/>
+        <van-field label="税号" value="" readonly v-if="invoiceForm.type === '企业'" v-model="company.taxNumber"/>
         <van-field label="更多" right-icon="arrow-down" v-if="invoiceForm.type    === '企业'" @click="purchaserMore"
                    v-show="hide"
                    readonly placeholder="地址、电话、开户行等"/>
         <div v-show="show">
           <van-field v-if="invoiceForm.type === '企业'" @click="purchaserMoreHide" label="地址" value="" readonly
-                     v-model="childCompany.address" right-icon="arrow-up"/>
-          <van-field v-if="invoiceForm.type === '企业'" label="电话" value="" readonly v-model="childCompany.phone"/>
-          <van-field v-if="invoiceForm.type === '企业'" label="开户行" value="" readonly v-model="childCompany.bank"/>
+                     v-model="company.address" right-icon="arrow-up"/>
+          <van-field v-if="invoiceForm.type === '企业'" label="电话" value="" readonly v-model="company.phone"/>
+          <van-field v-if="invoiceForm.type === '企业'" label="开户行" value="" readonly v-model="company.bank"/>
           <van-field v-if="invoiceForm.type === '企业'" label="银行账号" value="" readonly
-                     v-model="childCompany.bankAccount"/>
+                     v-model="company.bankAccount"/>
         </div>
       </form>
     </div>
@@ -78,13 +80,10 @@
         address: "",
         show: this.isShow,
         hide: this.isHide,
-        childInvoiceForm: {
-          category: "",
-          property: ""
-        },
-        childForm: {
+        invoiceForm: {
           type: "",
           category: "",
+          property: "",
           purchaserName: "",
           purchaserTaxpayerNumber: "",
           purchaserAddress: "",
@@ -93,7 +92,7 @@
           purchaserBankAccount: "",
           companyId: ""
         },
-        childCompany: {
+        company: {
           name: "",
           taxNumber: "",
           address: "",
@@ -107,26 +106,26 @@
 
     methods: {
       changeElectronic() {
-        this.$emit("getcategorydata", this.childInvoiceForm.category = "增值税电子普通发票");
-        this.$emit("getpropertydata", this.childInvoiceForm.property = "电子");
+        this.$emit("getcategorydata", this.invoiceForm.category = "增值税电子普通发票");
+        this.$emit("getpropertydata", this.invoiceForm.property = "电子");
       },
       changePaper() {
-        this.$emit("getcategorydata", this.childInvoiceForm.category = "增值税普通发票");
-        this.$emit("getpropertydata", this.childInvoiceForm.property = "纸质");
+        this.$emit("getcategorydata", this.invoiceForm.category = "增值税普通发票");
+        this.$emit("getpropertydata", this.invoiceForm.property = "纸质");
       },
       selectInvoiceType() {
-        localStorage.setItem("type", this.childForm.type);
-        if (this.childForm.type === "企业") {
+        localStorage.setItem("type", this.invoiceForm.type);
+        if (this.invoiceForm.type === "企业") {
           this.getDefaultCompany();
           this.getDefaultAddress();
-        } else if (this.childForm.type === "个人") {
-          this.childForm.purchaserName = "";
-          this.childForm.purchaserTaxpayerNumber = "";
-          this.childForm.purchaserAddress = "";
-          this.childForm.purchaserPhone = "";
-          this.childForm.purchaserBank = "";
-          this.childForm.purchaserBankAccount = "";
-          this.childForm.companyId = "";
+        } else if (this.invoiceForm.type === "个人") {
+          this.invoiceForm.purchaserName = "";
+          this.invoiceForm.purchaserTaxpayerNumber = "";
+          this.invoiceForm.purchaserAddress = "";
+          this.invoiceForm.purchaserPhone = "";
+          this.invoiceForm.purchaserBank = "";
+          this.invoiceForm.purchaserBankAccount = "";
+          this.invoiceForm.companyId = "";
         }
       },
       /** 前往抬头管理页 */
@@ -135,7 +134,7 @@
           path: "/company/",
           name: "Company",
           params: {
-            id: this.childCompany ? this.childCompany.companyId : "",
+            id: this.company ? this.company.companyId : "",
             from: "make"
           }
         });
@@ -153,14 +152,14 @@
       getDefaultCompany() {
         getDefaultCompany().then((res) => {
           if (res.data.code === 1) {
-            this.childCompany = res.data.content;
-            this.childForm.purchaserName = this.childCompany.name;
-            this.childForm.purchaserTaxpayerNumber = this.childCompany.taxNumber;
-            this.childForm.purchaserAddress = this.childCompany.address;
-            this.childForm.purchaserPhone = this.childCompany.phone;
-            this.childForm.purchaserBank = this.childCompany.bank;
-            this.childForm.purchaserBankAccount = this.childCompany.bankAccount;
-            this.childForm.companyId = this.childCompany.companyId;
+            this.company = res.data.content;
+            this.invoiceForm.purchaserName = this.company.name;
+            this.invoiceForm.purchaserTaxpayerNumber = this.company.taxNumber;
+            this.invoiceForm.purchaserAddress = this.company.address;
+            this.invoiceForm.purchaserPhone = this.company.phone;
+            this.invoiceForm.purchaserBank = this.company.bank;
+            this.invoiceForm.purchaserBankAccount = this.company.bankAccount;
+            this.invoiceForm.companyId = this.company.companyId;
           }
         });
       },
@@ -168,14 +167,14 @@
         getDefaultAddress().then((res) => {
           if (res.data.code === 1) {
             this.address = res.data.content;
-            this.childForm.addressId = this.address.addressId;
+            this.invoiceForm.addressId = this.address.addressId;
           }
         });
       },
     },
     mounted() {
-      this.childForm = this.invoiceForm;
-      this.childCompany = this.company;
+      this.invoiceForm = this.invoiceForm;
+      this.company = this.company;
     }
   };
 </script>

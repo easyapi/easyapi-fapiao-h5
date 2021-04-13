@@ -95,7 +95,7 @@
           addrMobile: "",
           email: "",
           remark: "",
-          price: ""
+          price: 0.0
         },
       };
     },
@@ -130,13 +130,16 @@
             return Toast("请输入发票抬头");
           }
         }
+        this.checkEmailMobile()
+        if (!this.ifCheckEmailMobile) {
+          return;
+        }
         Dialog.confirm({
           title: '提示',
           message: '确认抬头正确并开票吗',
           showCancelButton: true
         }).then(action => {
           if (action === "confirm") {
-            this.checkEmailMobile();
             this.invoiceForm.category = "增值税电子普通发票";
             this.invoiceForm.property = "电子";
             this.invoiceForm.outOrderNo = this.outOrder.outOrderNo;

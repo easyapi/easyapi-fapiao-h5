@@ -144,7 +144,7 @@
           email: "",
           companyId: null,
           addressId: null,
-          price: 0
+          price: 0.0
         },
         productListAll: [],
         productKeyword: "",//商品服务搜索关键字
@@ -155,42 +155,6 @@
     methods: {
       goBack() {
         history.go(-1);
-      },
-      makeInvoice() {
-        this.checkEmailMobile();
-        if (this.invoiceForm.type === '个人') {
-          if (this.invoiceForm.purchaserName == "") {
-            return Toast("请输入发票抬头");
-          } else {
-            if (this.productList === null) {
-              return Toast("商品服务不能为空");
-            }
-          }
-        } else {
-          if (this.productList === null) {
-            return Toast("商品服务不能为空");
-          }
-        }
-        Dialog.confirm({
-          title: "提示",
-          message: "确认抬头正确并开票吗？"
-        }).then(() => {
-          Toast.loading({
-            message: "开票中...",
-            forbidClick: true
-          });
-          this.invoiceForm.products = this.productList;
-          productMakeInvoice(this.invoiceForm).then(res => {
-            if (res.data.code === 1) {
-              Toast.clear();
-              this.$router.push(`/make/success`);
-            }
-          }).catch(error => {
-            Toast(error.response.data.message);
-          });
-        }).catch(() => {
-        });
-        localStorage.removeItem("productList");
       },
       /** 计算发票金额 */
       calcAmount() {
@@ -263,6 +227,45 @@
           }
           this.productPrice = total;
         }
+      },
+      makeInvoice() {
+        if (this.invoiceForm.type === '个人') {
+          if (this.invoiceForm.purchaserName == "") {
+            return Toast("请输入发票抬头");
+          } else {
+            if (this.productList === null) {
+              return Toast("商品服务不能为空");
+            }
+          }
+        } else {
+          if (this.productList === null) {
+            return Toast("商品服务不能为空");
+          }
+        }
+        this.checkEmailMobile()
+        if (!this.ifCheckEmailMobile) {
+          return;
+        }
+        Dialog.confirm({
+          title: "提示",
+          message: "确认抬头正确并开票吗？"
+        }).then(() => {
+          Toast.loading({
+            message: "开票中...",
+            forbidClick: true
+          });
+          this.invoiceForm.products = this.productList;
+          productMakeInvoice(this.invoiceForm).then(res => {
+            if (res.data.code === 1) {
+              Toast.clear();
+              this.$router.push(`/make/success`);
+            }
+          }).catch(error => {
+            Toast(error.response.data.message);
+          });
+        }).catch(() => {
+        });
+        localStorage.removeItem("productList");
       },
     },
     mounted() {

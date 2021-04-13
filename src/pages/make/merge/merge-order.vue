@@ -78,7 +78,7 @@
           addrMobile: "",
           email: "",
           remark: "",
-          price: ""
+          price: 0.0
         },
       };
     },
@@ -102,7 +102,6 @@
           this.invoiceForm.property = "电子";
         }
       },
-
       /**
        * 提交开票信息
        */
@@ -112,11 +111,14 @@
             return Toast("请输入发票抬头");
           }
         }
+        this.checkEmailMobile()
+        if (!this.ifCheckEmailMobile) {
+          return;
+        }
         Dialog.confirm({
           title: '提示',
           message: '确认抬头和金额正确并申请开票吗？',
         }).then(() => {
-          this.checkEmailMobile();
           Toast.loading({
             message: '开票中...',
             forbidClick: true,
