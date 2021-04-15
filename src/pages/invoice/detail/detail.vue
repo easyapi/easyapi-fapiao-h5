@@ -21,9 +21,9 @@
     <div class="page-part" v-show="invoiceDetail.category=='增值税电子普通发票'">
       <p>接收方式</p>
       <van-field label="电子邮件" v-model="invoiceDetail.email"/>
-      <van-field label="手机号码" v-model="invoiceDetail.addrMobile"/>
-      <a @click="goAssociatedOrder" v-if="outOrderCount > 0">
-        <van-cell :title="'1张发票，含'+ outOrderCount + '个商品'" :label="invoiceDetail.updateTime" is-link></van-cell>
+      <van-field label="联系方式" v-model="invoiceDetail.addrMobile"/>
+      <a @click="goAssociatedOrder">
+        <van-cell :title="'1张发票，含'+ invoiceItems.length + '个商品'" :label="invoiceDetail.updateTime" is-link></van-cell>
       </a>
       <!-- <div class="bottom"> -->
       <!--<mt-button class="submit" @click="goElectronicInvoice">重发电子发票与订单</mt-button>-->
@@ -32,7 +32,7 @@
     <div class="page-part" v-show="invoiceDetail.category=='增值税普通发票' ||invoiceDetail.category=='增值税专用发票'">
       <p>接收方式</p>
       <van-field label="收件人" readonly></van-field>
-      <van-field label="手机号码" readonly></van-field>
+      <van-field label="联系方式" readonly></van-field>
       <!--<van-cell title="邮寄地址" :value="address.province + address.city + address.district + address.addr"-->
       <!--readonly></van-cell>-->
     </div>
@@ -52,7 +52,7 @@
         >复制发票下载地址
         </van-button>
       </div>
-      <div style="width:200px;font-size:12px">
+      <div style="width:200px;fontSize:12px">
         <textarea :value="url" style="width:300px"/>
       </div>
       <p style="margin-top:7px">复制发票下载地址并在浏览器中打开进行下载</p>
@@ -61,8 +61,7 @@
 </template>
 
 <script>
-  import {getInvoice} from "../../../api/invoice";
-  import {outOrderCount} from "../../../api/out-order";
+  import { getInvoice, getOutOrderList } from "../../../api/invoice";
   import Header from "../../../components/Header.vue";
   import Clipboard from "clipboard";
 
@@ -76,7 +75,8 @@
         headerTitle: "发票详情",
         active: "tab-container1",
         invoiceDetail: {},
-        outOrderCount: 0,//该发票是否是外部是否开票，如果是则不为0
+        invoiceItems: [],
+        invoiceDetailItems: [],
         serviceType: "",
         url: "",
         imgUrl: "",
@@ -111,34 +111,35 @@
           this.url = res.data.content.electronicInvoiceUrl;
           this.imgUrl = res.data.content.electronicInvoiceImg;
           this.serviceType = res.data.content.serviceType;
+          this.invoiceItems = this.invoiceDetail.invoiceItems;
         }).catch(error => {
           Toast(error.response.data.message);
         });
       },
-      /**
-       * 获取外部订单数量
-       */
-      getOutOrderCount() {
-        outOrderCount({invoiceId: this.$route.query.id}).then(res => {
-          if (res.data.code === 1) {
-            this.outOrderCount = res.data.content
-          }
-        })
+      getOutOrderList() {
+        let params = {
+          invoiceId: this.$route.query.id
+        };
+        getOutOrderList(params).then(res => {
+          this.invoiceDetailItems = res.data.content;
+        }).catch(error => {
+          Toast(error.response.data.message);
+        });
       },
       goAssociatedOrder() {
         this.$router.push({
           path: "/invoice/out-order",
-          query: {id: this.$route.query.id}
+          query: { id: this.$route.query.id }
         });
       },
       copyLink() {
         let _this = this;
         let clipboard = new this.clipboard(".copyPdfUrl");
-        clipboard.on("success", function () {
-          _this.$toast({message: "复制成功", className: "top-toast"});
+        clipboard.on("success", function() {
+          _this.$toast({ message: "复制成功", className: "top-toast" });
         });
-        clipboard.on("error", function () {
-          _this.$toast({message: "复制失败", className: "top-toast"});
+        clipboard.on("error", function() {
+          _this.$toast({ message: "复制失败", className: "top-toast" });
         });
       }
     },
@@ -153,7 +154,7 @@
     },
     mounted() {
       this.getInvoiceDetail();
-      this.getOutOrderCount();
+      this.getOutOrderList();
     }
   };
 </script>
