@@ -17,3 +17,16 @@ export const getOutOrderList = (params, page) => {
     params: params
   });
 };
+
+
+/**
+ * 获取外部订单数量
+ *
+ * @see https://www.easyai.com
+ */
+export const outOrderCount = (params) => {
+  params.accessToken = localStorage.getItem("accessToken");
+  return axios.get(`${baseUrl}/out-order/count`, {
+    params: params
+  });
+};

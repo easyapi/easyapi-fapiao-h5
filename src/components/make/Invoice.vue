@@ -9,7 +9,7 @@
             style="margin-right:5px"
             @click="changeElectronic">
             <p style="font-size: 16px; margin-top: -6px">电子发票</p>
-            <p style="font-size: 12px; margin-top: 6px">最快1分钟开具</p>
+            <p style="font-size: 12px; margin-top: 6px">{{electronicInvoiceMakeTime}}</p>
           </div>
         </van-col>
         <van-col span="12" v-show="this.ifPaper ==='true'">
@@ -43,18 +43,18 @@
                    v-model="childInvoiceForm.purchaserName"/>
         <van-field label="发票抬头" readonly v-if="childInvoiceForm.type === '企业'" @click="gotoCompany"
                    right-icon="arrow"
-                   placeholder="请选择发票抬头" v-model="chidlCompany.name"/>
-        <van-field label="税号" value="" readonly v-if="childInvoiceForm.type === '企业'" v-model="chidlCompany.taxNumber"/>
+                   placeholder="请选择发票抬头" v-model="childCompany.name"/>
+        <van-field label="税号" value="" readonly v-if="childInvoiceForm.type === '企业'" v-model="childCompany.taxNumber"/>
         <van-field label="更多" right-icon="arrow-down" v-if="childInvoiceForm.type    === '企业'" @click="purchaserMore"
                    v-show="hide"
                    readonly placeholder="地址、电话、开户行等"/>
         <div v-show="show">
           <van-field v-if="childInvoiceForm.type === '企业'" @click="purchaserMoreHide" label="地址" value="" readonly
-                     v-model="chidlCompany.address" right-icon="arrow-up"/>
-          <van-field v-if="childInvoiceForm.type === '企业'" label="电话" value="" readonly v-model="chidlCompany.phone"/>
-          <van-field v-if="childInvoiceForm.type === '企业'" label="开户行" value="" readonly v-model="chidlCompany.bank"/>
+                     v-model="childCompany.address" right-icon="arrow-up"/>
+          <van-field v-if="childInvoiceForm.type === '企业'" label="电话" value="" readonly v-model="childCompany.phone"/>
+          <van-field v-if="childInvoiceForm.type === '企业'" label="开户行" value="" readonly v-model="childCompany.bank"/>
           <van-field v-if="childInvoiceForm.type === '企业'" label="银行账号" value="" readonly
-                     v-model="chidlCompany.bankAccount"/>
+                     v-model="childCompany.bankAccount"/>
         </div>
       </form>
     </div>
@@ -62,8 +62,9 @@
 </template>
 
 <script>
-  import { getDefaultCompany } from "../../api/company";
-  import { getDefaultAddress } from "../../api/address";
+  import {getDefaultCompany} from "../../api/company";
+  import {getDefaultAddress} from "../../api/address";
+  import {findSetting} from '../../api/setting'
 
   export default {
     name: "Invoice",
@@ -73,11 +74,12 @@
       "ifPaper",
       "company",
       "isHide",
-      "isShow"
+      "isShow",
     ],
     data() {
       return {
         address: "",
+        electronicInvoiceMakeTime: "最快1分钟开具",
         show: this.isShow,
         hide: this.isHide,
         childInvoiceForm: {
@@ -92,7 +94,7 @@
           purchaserBankAccount: "",
           companyId: ""
         },
-        chidlCompany: {
+        childCompany: {
           name: "",
           taxNumber: "",
           address: "",
@@ -130,12 +132,12 @@
       },
       /** 前往抬头管理页 */
       gotoCompany() {
-        console.log(this.chidlCompany.name);
+        console.log(this.childCompany.name);
         this.$router.push({
           path: "/company/",
           name: "Company",
           params: {
-            id: this.chidlCompany ? this.chidlCompany.companyId : "",
+            id: this.childCompany ? this.childCompany.companyId : "",
             from: "make"
           }
         });
@@ -153,14 +155,14 @@
       getDefaultCompany() {
         getDefaultCompany().then((res) => {
           if (res.data.code === 1) {
-            this.chidlCompany = res.data.content;
-            this.childInvoiceForm.purchaserName = this.chidlCompany.name;
-            this.childInvoiceForm.purchaserTaxpayerNumber = this.chidlCompany.taxNumber;
-            this.childInvoiceForm.purchaserAddress = this.chidlCompany.address;
-            this.childInvoiceForm.purchaserPhone = this.chidlCompany.phone;
-            this.childInvoiceForm.purchaserBank = this.chidlCompany.bank;
-            this.childInvoiceForm.purchaserBankAccount = this.chidlCompany.bankAccount;
-            this.childInvoiceForm.companyId = this.chidlCompany.companyId;
+            this.childCompany = res.data.content;
+            this.childInvoiceForm.purchaserName = this.childCompany.name;
+            this.childInvoiceForm.purchaserTaxpayerNumber = this.childCompany.taxNumber;
+            this.childInvoiceForm.purchaserAddress = this.childCompany.address;
+            this.childInvoiceForm.purchaserPhone = this.childCompany.phone;
+            this.childInvoiceForm.purchaserBank = this.childCompany.bank;
+            this.childInvoiceForm.purchaserBankAccount = this.childCompany.bankAccount;
+            this.childInvoiceForm.companyId = this.childCompany.companyId;
           }
         });
       },
@@ -171,11 +173,22 @@
             this.childInvoiceForm.addressId = this.address.addressId;
           }
         });
-      }
+      },
+      /**
+       * 获取电子发票文案说明
+       */
+      findSetting() {
+        findSetting({fieldKeys: "electronic_invoice_make_time"}).then(res => {
+          if (res.data.code === 1) {
+            this.electronicInvoiceMakeTime = res.data.content[0].fieldValue
+          }
+        })
+      },
     },
     mounted() {
+      this.findSetting();
       this.childInvoiceForm = this.invoiceForm;
-      this.chidlCompany = this.company;
+      this.childCompany = this.company;
     }
   };
 </script>

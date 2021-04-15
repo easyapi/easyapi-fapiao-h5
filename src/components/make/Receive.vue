@@ -3,7 +3,7 @@
     <div class="page-part" style="margin-bottom: 60px" v-show="ifElectronic">
       <p>接收方式</p>
       <van-field label="电子邮箱" v-model="childForm.email"></van-field>
-      <van-field label="联系方式" v-model="childForm.addrMobile"></van-field>
+      <van-field label="手机号码" v-model="childForm.addrMobile"></van-field>
     </div>
     <div class="page-part" style="margin-bottom: 60px" v-if="!ifElectronic">
       <p>接收方式</p>
@@ -15,7 +15,7 @@
         v-model="childAddress.name"
       ></van-field>
       <van-field
-        label="联系方式"
+        label="手机号码"
         v-model="childAddress.mobile"
         readonly
       ></van-field>

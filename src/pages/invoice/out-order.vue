@@ -1,13 +1,13 @@
 <template>
   <div class="associated-con">
     <Header @head-back="goBack()" :headerTitle="headerTitle"></Header>
-    <div class="order-con address-con header-d address-bottom" v-for="(item,index) in invoiceItems" :key="index">
+    <div class="order-con address-con header-d address-bottom" v-for="(item,index) in outOrders" :key="index">
       <van-cell-group :border="false">
         <van-cell title="订单编号：" :value="item.no" :border="false"/>
-        <van-cell title="订单内容：" :value="item.name" :border="false"/>
+        <van-cell v-if="item.fields" :title="Object.values(JSON.parse(item.fields))[0]" :value="item.noY" :border="false"/>
         <van-cell title="" :value="item.model" :border="false"/>
         <div>
-          <span class="price">￥{{ item.price * item.number }}</span>
+          <span class="price">￥{{ item.price}}</span>
           <span class="time">小计</span>
         </div>
       </van-cell-group>
@@ -27,7 +27,7 @@
     data() {
       return {
         headerTitle: "关联订单",
-        invoiceItems: []
+        outOrders: []
       };
     },
     methods: {
@@ -36,7 +36,7 @@
       },
       getOutOrderList() {
         getOutOrderList({invoiceId: this.$route.query.id}).then(res => {
-          this.invoiceItems = res.data.content
+          this.outOrders = res.data.content
         }).catch(error => {
           Toast(error.response.data.message);
         });

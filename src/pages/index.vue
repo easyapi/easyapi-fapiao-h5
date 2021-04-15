@@ -67,7 +67,6 @@
             }, 1500);
           }
         }).catch(error => {
-          console.log(error);
           Toast.clear();
           Toast(error.response.data.message);
         });
@@ -84,7 +83,7 @@
           this.ifOrderMake = res.data.content.ifOrder;
           localStorage.setItem("ifOrderMake", this.ifOrderMake);
         }).catch(error => {
-          console.log(error);
+          Toast(error.response.data.message);
         });
       }
     },
