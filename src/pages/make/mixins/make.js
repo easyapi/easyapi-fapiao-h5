@@ -2,14 +2,14 @@
  * 开票页Mixin
  */
 
-import {getRule} from "../../../api/info";
-import {getShopSupport} from "../../../api/shop";
-import {Toast} from "vant";
+import { getRule } from "../../../api/info";
+import { getShopSupport } from "../../../api/shop";
+import { Toast } from "vant";
 import Isemail from "isemail";
 import isChinesePhoneNumber from "is-chinese-phone-number";
 
 export default {
-  name: 'makeMixins',
+  name: "makeMixins",
   props: {},
 
   data() {
@@ -28,7 +28,7 @@ export default {
   computed: {},
   async mounted() {
     this.getInvoiceRemark();
-    this.getShopSupport()
+    this.getShopSupport();
   },
   methods: {
     /**
@@ -37,8 +37,7 @@ export default {
     getInvoiceRemark() {
       if (localStorage.getItem("invoiceForm")) {
         this.invoiceForm.remark = JSON.parse(localStorage.getItem("invoiceForm")).remark;
-      }
-      else {
+      } else {
         getRule().then((res) => {
           this.remarkPlaceholder = res.data.content.remark;
         });
@@ -65,13 +64,13 @@ export default {
           Toast("请输入邮箱");
           this.ifCheckEmailMobile = false;
         } else if (!Isemail.validate(this.invoiceForm.email)) {
-          Toast("邮箱格式不正确")
+          Toast("邮箱格式不正确");
           this.ifCheckEmailMobile = false;
         }
       } else {
         if (this.invoiceForm.email) {
           if (!Isemail.validate(this.invoiceForm.email)) {
-            Toast("邮箱格式不正确")
+            Toast("邮箱格式不正确");
             this.ifCheckEmailMobile = false;
           }
         }
@@ -84,12 +83,16 @@ export default {
         } else if (!isChinesePhoneNumber.mobile(this.invoiceForm.addrMobile)) {
           Toast("手机格式不正确");
           this.ifCheckEmailMobile = false;
+        } else {
+          this.ifCheckEmailMobile = true;
         }
       } else {
         if (this.invoiceForm.addrMobile) {
           if (!isChinesePhoneNumber.mobile(this.invoiceForm.addrMobile)) {
             Toast("手机格式不正确");
             this.ifCheckEmailMobile = false;
+          } else {
+            this.ifCheckEmailMobile = true;
           }
         }
       }
@@ -99,6 +102,6 @@ export default {
     },
     receiveProperty(val) {
       this.invoiceForm.property = val;
-    },
-  },
+    }
+  }
 };

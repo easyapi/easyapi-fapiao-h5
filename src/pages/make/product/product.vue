@@ -243,6 +243,7 @@
           }
         }
         this.checkEmailMobile()
+        console.log(this.ifCheckEmailMobile)
         if (!this.ifCheckEmailMobile) {
           return;
         }
