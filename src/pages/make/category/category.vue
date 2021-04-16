@@ -44,7 +44,7 @@
         <van-field label="发票备注" :placeholder="remarkPlaceholder" v-model="invoiceForm.remark"></van-field>
         <van-cell title="附件">
           <van-uploader
-            v-model="invoiceForm.extends"
+            v-model="invoiceForm.image"
             multiple
             :max-count="1"
             :data="{ key: qnKey, token: qnToken }"
@@ -67,13 +67,13 @@
 </template>
 
 <script>
-  import {getQiniuToken, getQiniuKey} from "../../../api/qiniu";
-  import {getCustomCategoryList} from "../../../api/custom-category";
-  import {getShopSupport} from "../../../api/shop";
-  import {getRule} from "../../../api/info";
-  import {categoryMakeInvoice} from "../../../api/make";
-  import {Toast} from "vant";
-  import {Dialog} from "vant";
+  import { getQiniuToken, getQiniuKey } from "../../../api/qiniu";
+  import { getCustomCategoryList } from "../../../api/custom-category";
+  import { getShopSupport } from "../../../api/shop";
+  import { getRule } from "../../../api/info";
+  import { categoryMakeInvoice } from "../../../api/make";
+  import { Toast } from "vant";
+  import { Dialog } from "vant";
   import axios from "axios";
   import Invoice from "../../../components/make/Invoice";
   import Receive from "../../../components/make/Receive";
@@ -105,6 +105,7 @@
           customCategoryId: null,
           name: ""
         },
+        fieldValue: "",
         invoiceForm: {
           category: "增值税电子普通发票",
           property: localStorage.getItem("ifElectronic") === "true" ? "电子" : "纸质",
@@ -119,11 +120,8 @@
           addrMobile: "",
           email: "",
           remark: "",
-          extends: [{
-            fieldKey: "attch",
-            fieldName: "附件",
-            fieldValue: ""
-          }]
+          image: [],
+          extends: []
         }
       };
     },
@@ -153,7 +151,7 @@
           data: data,
           timeout: 30000      //超时时间，因为图片上传时间有可能比较长
         }).then(res => {
-          this.invoiceForm.extends[0].fieldValue = "https://qiniu.easyapi.com/" + res.data.key;
+          this.fieldValue = "https://qiniu.easyapi.com/" + res.data.key;
         });
       },
       goBack() {
@@ -192,7 +190,7 @@
         } else if (!regPrice.test(this.invoiceForm.price)) {
           return Toast("请输入合法开票金额，最多2位小数");
         }
-        if (this.invoiceForm.extends[0].fieldValue === "") {
+        if (this.invoiceForm.image.length === 0) {
           return Toast("附件一栏请上传付款记录凭证");
         }
         Dialog.confirm({
@@ -205,8 +203,13 @@
           });
           that.invoiceForm.customCategoryId = that.customCategory.customCategoryId;
           that.invoiceForm.companyId = that.company.companyId;
-          console.log(that.company)
-          console.log(that.invoiceForm)
+          let obj = {};
+          obj.fieldKey = "attch";
+          obj.fieldName = "附件";
+          obj.fieldValue = this.fieldValue;
+          this.invoiceForm.extends.push(obj);
+          console.log(this.invoiceForm)
+          return;
           categoryMakeInvoice(that.invoiceForm).then(res => {
             if (res.data.code === 1) {
               Toast.clear();
