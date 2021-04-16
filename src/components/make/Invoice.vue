@@ -62,9 +62,9 @@
 </template>
 
 <script>
-  import {getDefaultCompany} from "../../api/company";
-  import {getDefaultAddress} from "../../api/address";
-  import {findSetting} from '../../api/setting'
+  import { getDefaultCompany } from "../../api/company";
+  import { getDefaultAddress } from "../../api/address";
+  import { findSetting } from "../../api/setting";
 
   export default {
     name: "Invoice",
@@ -74,7 +74,7 @@
       "ifPaper",
       "company",
       "isHide",
-      "isShow",
+      "isShow"
     ],
     data() {
       return {
@@ -156,6 +156,8 @@
         getDefaultCompany().then((res) => {
           if (res.data.code === 1) {
             this.childCompany = res.data.content;
+            this.$emit("getCompanyId", this.childCompany);
+            return this.childCompany;
             this.childInvoiceForm.purchaserName = this.childCompany.name;
             this.childInvoiceForm.purchaserTaxpayerNumber = this.childCompany.taxNumber;
             this.childInvoiceForm.purchaserAddress = this.childCompany.address;
@@ -178,17 +180,16 @@
        * 获取电子发票文案说明
        */
       findSetting() {
-        findSetting({fieldKeys: "electronic_invoice_make_time"}).then(res => {
+        findSetting({ fieldKeys: "electronic_invoice_make_time" }).then(res => {
           if (res.data.code === 1) {
-            this.electronicInvoiceMakeTime = res.data.content[0].fieldValue
+            this.electronicInvoiceMakeTime = res.data.content[0].fieldValue;
           }
-        })
-      },
+        });
+      }
     },
     mounted() {
       this.findSetting();
       this.childInvoiceForm = this.invoiceForm;
-      this.childCompany = this.company;
     }
   };
 </script>

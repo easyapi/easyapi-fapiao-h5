@@ -4,8 +4,9 @@
       <div id="loading">
         <van-loading v-show="loadingList" type="spinner" color="#56cbf6"/>
       </div>
-      <Invoice :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
+      <Invoice ref="child" :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
+               @getCompanyId="receiveCompanyId"
                @getcategorydata="receiveCategory" @getpropertydata="receiveProperty"></Invoice>
     </div>
     <div>
@@ -226,6 +227,9 @@
         }).catch(error => {
           Toast(error.response.data.message);
         });
+      },
+      receiveCompanyId(val) {
+        this.company = val;
       },
       receiveCategory(val) {
         this.invoiceForm.category = val;
