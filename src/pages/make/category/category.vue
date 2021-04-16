@@ -6,7 +6,7 @@
       </div>
       <Invoice ref="child" :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
-               @getCompanyId="receiveCompanyId"
+               @getCompany="receiveCompany"
                @getcategorydata="receiveCategory" @getpropertydata="receiveProperty"></Invoice>
     </div>
     <div>
@@ -228,7 +228,7 @@
           Toast(error.response.data.message);
         });
       },
-      receiveCompanyId(val) {
+      receiveCompany(val) {
         this.company = val;
       },
       receiveCategory(val) {

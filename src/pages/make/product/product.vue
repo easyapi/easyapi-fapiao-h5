@@ -7,6 +7,7 @@
       </div>
       <Invoice :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
+               @getCompany="receiveCompany"
                @getcategorydata="receiveCategory" @getpropertydata="receiveProperty"></Invoice>
     </div>
     <div class="invoice-contents">
@@ -227,6 +228,15 @@
           }
           this.productPrice = total;
         }
+      },
+      receiveCompany(val) {
+        this.company = val;
+      },
+      receiveCategory(val) {
+        this.invoiceForm.category = val;
+      },
+      receiveProperty(val) {
+        this.invoiceForm.property = val;
       },
       makeInvoice() {
         if (this.invoiceForm.type === '个人') {

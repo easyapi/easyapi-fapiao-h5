@@ -156,7 +156,7 @@
         getDefaultCompany().then((res) => {
           if (res.data.code === 1) {
             this.childCompany = res.data.content;
-            this.$emit("getCompanyId", this.childCompany);
+            this.$emit("getCompany", this.childCompany);
             return this.childCompany;
             this.childInvoiceForm.purchaserName = this.childCompany.name;
             this.childInvoiceForm.purchaserTaxpayerNumber = this.childCompany.taxNumber;
