@@ -157,6 +157,7 @@
     },
     mounted() {
       this.getOrder();
+      this.loadingList = false;
     }
   };
 </script>

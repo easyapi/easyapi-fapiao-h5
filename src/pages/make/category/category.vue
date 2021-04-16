@@ -66,13 +66,13 @@
 </template>
 
 <script>
-  import { getQiniuToken, getQiniuKey } from "../../../api/qiniu";
-  import { getCustomCategoryList } from "../../../api/custom-category";
-  import { getShopSupport } from "../../../api/shop";
-  import { getRule } from "../../../api/info";
-  import { categoryMakeInvoice } from "../../../api/make";
-  import { Toast } from "vant";
-  import { Dialog } from "vant";
+  import {getQiniuToken, getQiniuKey} from "../../../api/qiniu";
+  import {getCustomCategoryList} from "../../../api/custom-category";
+  import {getShopSupport} from "../../../api/shop";
+  import {getRule} from "../../../api/info";
+  import {categoryMakeInvoice} from "../../../api/make";
+  import {Toast} from "vant";
+  import {Dialog} from "vant";
   import axios from "axios";
   import Invoice from "../../../components/make/Invoice";
   import Receive from "../../../components/make/Receive";
@@ -170,9 +170,10 @@
         });
       },
       makeInvoice() {
+        let that = this;
         this.checkEmailMobile();
         if (this.invoiceForm.type === "个人") {
-          if (this.invoiceForm.purchaserName == "") {
+          if (this.invoiceForm.purchaserName === "") {
             return Toast("请输入发票抬头");
           } else {
             if (this.customCategory == null || this.customCategory.customCategoryId == null) {
@@ -201,12 +202,14 @@
             message: "开票中...",
             forbidClick: true
           });
-          this.invoiceForm.customCategoryId = this.customCategory.customCategoryId;
-          this.invoiceForm.companyId = this.company.companyId;
-          categoryMakeInvoice(this.invoiceForm).then(res => {
+          that.invoiceForm.customCategoryId = that.customCategory.customCategoryId;
+          that.invoiceForm.companyId = that.company.companyId;
+          console.log(that.company)
+          console.log(that.invoiceForm)
+          categoryMakeInvoice(that.invoiceForm).then(res => {
             if (res.data.code === 1) {
               Toast.clear();
-              this.$router.push({
+              that.$router.push({
                 path: "/make/category-success"
               });
             }
@@ -255,6 +258,7 @@
       this.getKey();
       this.getShopSupport();
       this.getCustomCategories();
+      this.loadingList = false;
     }
   };
 </script>
