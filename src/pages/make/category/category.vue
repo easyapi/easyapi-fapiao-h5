@@ -7,7 +7,7 @@
       <Invoice ref="child" :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
                @getCompany="receiveCompany"
-               @getcategorydata="receiveCategory" @getpropertydata="receiveProperty"></Invoice>
+               @getInvoiceCategory="receiveCategory" @getInvoiceProperty="receiveProperty"></Invoice>
     </div>
     <div>
       <div class="invoice-contents">
@@ -67,13 +67,12 @@
 </template>
 
 <script>
-  import { getQiniuToken, getQiniuKey } from "../../../api/qiniu";
-  import { getCustomCategoryList } from "../../../api/custom-category";
-  import { getShopSupport } from "../../../api/shop";
-  import { getRule } from "../../../api/info";
-  import { categoryMakeInvoice } from "../../../api/make";
-  import { Toast } from "vant";
-  import { Dialog } from "vant";
+  import {getQiniuToken, getQiniuKey} from "../../../api/qiniu";
+  import {getCustomCategoryList} from "../../../api/custom-category";
+  import {getShopSupport} from "../../../api/shop";
+  import {categoryMakeInvoice} from "../../../api/make";
+  import {Toast} from "vant";
+  import {Dialog} from "vant";
   import axios from "axios";
   import Invoice from "../../../components/make/Invoice";
   import Receive from "../../../components/make/Receive";
@@ -171,18 +170,11 @@
       makeInvoice() {
         let that = this;
         this.checkEmailMobile();
-        if (this.invoiceForm.type === "个人") {
-          if (this.invoiceForm.purchaserName === "") {
-            return Toast("请输入发票抬头");
-          } else {
-            if (this.customCategory == null || this.customCategory.customCategoryId == null) {
-              return Toast("请选择发票类别");
-            }
-          }
-        } else {
-          if (this.customCategory == null || this.customCategory.customCategoryId == null) {
-            return Toast("请选择发票类别");
-          }
+        if (this.invoiceForm.type === "个人" && this.invoiceForm.purchaserName === "") {
+          return Toast("请输入发票抬头");
+        }
+        if (this.customCategory == null || this.customCategory.customCategoryId == null) {
+          return Toast("请选择发票类别");
         }
         let regPrice = /^(([1-9]{1}\d*)|(0{1}))(\.\d{1,2})?$/;
         if (this.invoiceForm.price == null || this.invoiceForm.price <= 0) {
@@ -208,8 +200,6 @@
           obj.fieldName = "附件";
           obj.fieldValue = this.fieldValue;
           this.invoiceForm.extends.push(obj);
-          console.log(this.invoiceForm)
-          return;
           categoryMakeInvoice(that.invoiceForm).then(res => {
             if (res.data.code === 1) {
               Toast.clear();

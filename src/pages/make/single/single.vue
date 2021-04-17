@@ -11,7 +11,7 @@
       </div>
       <Invoice :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
-               @getcategorydata="receiveCategory" @getpropertydata="receiveProperty"></Invoice>
+               @getInvoiceCategory="receiveCategory" @getInvoiceProperty="receiveProperty"></Invoice>
     </div>
     <div class="invoice-contents">
       <p>发票内容</p>

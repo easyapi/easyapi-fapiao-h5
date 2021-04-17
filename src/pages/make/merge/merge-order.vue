@@ -11,7 +11,7 @@
       </div>
       <Invoice :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
-               @getcategorydata="receiveCategory" @getpropertydata="receiveProperty"></Invoice>
+               @getInvoiceCategory="receiveCategory" @getInvoiceProperty="receiveProperty"></Invoice>
     </div>
     <div class="invoice-contents">
       <p>发票内容</p>
@@ -106,10 +106,8 @@
        * 提交开票信息
        */
       makeInvoice() {
-        if (this.invoiceForm.type === '个人') {
-          if (this.invoiceForm.purchaserName == "") {
-            return Toast("请输入发票抬头");
-          }
+        if (this.invoiceForm.type === '个人' && this.invoiceForm.purchaserName === "") {
+          return Toast("请输入发票抬头");
         }
         this.checkEmailMobile()
         if (!this.ifCheckEmailMobile) {

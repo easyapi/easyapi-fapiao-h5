@@ -11,7 +11,7 @@
       </div>
       <Invoice :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
-               @getcategorydata="receiveCategory" @getpropertydata="receiveProperty"></Invoice>
+               @getInvoiceCategory="receiveCategory" @getInvoiceProperty="receiveProperty"></Invoice>
     </div>
     <div class="invoice-contents">
       <p>发票内容</p>
@@ -118,19 +118,17 @@
           }
         });
         queryShopOrder(this.outOrderNo).then(res => {
-          if (res.data.code == 1) {
+          if (res.data.code === 1) {
             this.outOrder = res.data.content;
             this.invoiceForm.price = res.data.content.price;
           }
         });
       },
       makeInvoice() {
-        if (this.invoiceForm.type === '个人') {
-          if (this.invoiceForm.purchaserName == "") {
-            return Toast("请输入发票抬头");
-          }
+        if (this.invoiceForm.type === '个人' && this.invoiceForm.purchaserName === "") {
+          return Toast("请输入发票抬头");
         }
-        this.checkEmailMobile()
+        this.checkEmailMobile();
         if (!this.ifCheckEmailMobile) {
           return;
         }

@@ -8,7 +8,7 @@
       <Invoice :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
                @getCompany="receiveCompany"
-               @getcategorydata="receiveCategory" @getpropertydata="receiveProperty"></Invoice>
+               @getInvoiceCategory="receiveCategory" @getInvoiceProperty="receiveProperty"></Invoice>
     </div>
     <div class="invoice-contents">
       <p>发票内容</p>
@@ -239,21 +239,13 @@
         this.invoiceForm.property = val;
       },
       makeInvoice() {
-        if (this.invoiceForm.type === '个人') {
-          if (this.invoiceForm.purchaserName == "") {
-            return Toast("请输入发票抬头");
-          } else {
-            if (this.productList === null) {
-              return Toast("商品服务不能为空");
-            }
-          }
-        } else {
-          if (this.productList === null) {
-            return Toast("商品服务不能为空");
-          }
+        if (this.invoiceForm.type === '个人' && this.invoiceForm.purchaserName === "") {
+          return Toast("请输入发票抬头");
         }
-        this.checkEmailMobile()
-        console.log(this.ifCheckEmailMobile)
+        if (this.productList === null) {
+          return Toast("商品服务不能为空");
+        }
+        this.checkEmailMobile();
         if (!this.ifCheckEmailMobile) {
           return;
         }
@@ -265,6 +257,7 @@
             message: "开票中...",
             forbidClick: true
           });
+          this.invoiceForm.companyId = this.company.companyId;
           this.invoiceForm.products = this.productList;
           productMakeInvoice(this.invoiceForm).then(res => {
             if (res.data.code === 1) {

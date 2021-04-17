@@ -137,11 +137,7 @@
         history.go(-1);
       },
       checked(index) {
-        if (this.outOrderList[index].satus === true) {
-          this.outOrderList[index].satus = false;
-        } else {
-          this.outOrderList[index].satus = true;
-        }
+        this.outOrderList[index].satus = this.outOrderList[index].satus !== true;
         this.selectList = this.outOrderList.filter(function(satus, index, outOrderList) {
           return outOrderList[index].satus === true;
         });
@@ -152,7 +148,7 @@
        */
       getMinusOutOrderList() {
         getOutOrderList({ maxPrice: -0.01, type: this.orderType }, { page: 0, size: 10000 }).then(res => {
-          if (res.data.code == 1) {
+          if (res.data.code === 1) {
             this.minusOutOrderList = res.data.content;
             for (let i = 0; i < this.minusOutOrderList.length; i++) {
               this.minusAmount += Number(this.minusOutOrderList[i].price);
@@ -199,7 +195,7 @@
        */
       loadMore() {
         this.allCheck = false;
-        if (this.page.total != 0 && this.page.page > 0 && this.page.page >= this.page.total) {
+        if (this.page.total !== 0 && this.page.page > 0 && this.page.page >= this.page.total) {
           this.loadMoreText = "没有更多数据了";
           return;
         }
@@ -251,7 +247,7 @@
        */
       totalPrice: function() {
         let totalPrice = 0;
-        if (this.outOrderList.length == 0) {
+        if (this.outOrderList.length === 0) {
           return totalPrice;
         }
         for (let i = 0; i < this.outOrderList.length; i++) {

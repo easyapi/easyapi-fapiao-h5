@@ -5,7 +5,7 @@
       <van-row type="flex" justify="space-between" class="invoice-type">
         <van-col span="12" v-show="ifElectronic ==='true'">
           <div
-            :class="{'invoice-type_blue_box': childInvoiceForm.property=='电子', 'invoice-type_gray_box': childInvoiceForm.property!='电子' }"
+            :class="{'invoice-type_blue_box': childInvoiceForm.property==='电子', 'invoice-type_gray_box': childInvoiceForm.property!=='电子' }"
             style="margin-right:5px"
             @click="changeElectronic">
             <p style="font-size: 16px; margin-top: -6px">电子发票</p>
@@ -14,7 +14,7 @@
         </van-col>
         <van-col span="12" v-show="this.ifPaper ==='true'">
           <div
-            :class="{'invoice-type_blue_box': childInvoiceForm.property=='纸质', 'invoice-type_gray_box': childInvoiceForm.property!='纸质' }"
+            :class="{'invoice-type_blue_box': childInvoiceForm.property==='纸质', 'invoice-type_gray_box': childInvoiceForm.property!=='纸质' }"
             style="margin-left:5px" @click="changePaper">
             <p style="font-size: 16px; margin-top: -6px">纸质发票</p>
             <p style="font-size: 12px; margin-top: 6px">预计一周送达</p>
@@ -62,9 +62,9 @@
 </template>
 
 <script>
-  import { getDefaultCompany } from "../../api/company";
-  import { getDefaultAddress } from "../../api/address";
-  import { findSetting } from "../../api/setting";
+  import {getDefaultCompany} from "../../api/company";
+  import {getDefaultAddress} from "../../api/address";
+  import {findSetting} from "../../api/setting";
 
   export default {
     name: "Invoice",
@@ -108,12 +108,12 @@
 
     methods: {
       changeElectronic() {
-        this.$emit("getcategorydata", this.childInvoiceForm.category = "增值税电子普通发票");
-        this.$emit("getpropertydata", this.childInvoiceForm.property = "电子");
+        this.$emit("getInvoiceCategory", this.childInvoiceForm.category = "增值税电子普通发票");
+        this.$emit("getInvoiceProperty", this.childInvoiceForm.property = "电子");
       },
       changePaper() {
-        this.$emit("getcategorydata", this.childInvoiceForm.category = "增值税普通发票");
-        this.$emit("getpropertydata", this.childInvoiceForm.property = "纸质");
+        this.$emit("getInvoiceCategory", this.childInvoiceForm.category = "增值税普通发票");
+        this.$emit("getInvoiceProperty", this.childInvoiceForm.property = "纸质");
       },
       selectInvoiceType() {
         localStorage.setItem("type", this.childInvoiceForm.type);
@@ -180,7 +180,7 @@
        * 获取电子发票文案说明
        */
       findSetting() {
-        findSetting({ fieldKeys: "electronic_invoice_make_time" }).then(res => {
+        findSetting({fieldKeys: "electronic_invoice_make_time"}).then(res => {
           if (res.data.code === 1) {
             this.electronicInvoiceMakeTime = res.data.content[0].fieldValue;
           }
