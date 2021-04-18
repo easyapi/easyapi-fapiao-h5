@@ -58,7 +58,14 @@
     data() {
       return {
         headerTitle: "",
-        companyForm: {},
+        companyForm: {
+          taxNumber:"",
+          address:"",
+          phone:"",
+          bank:"",
+          bankAccount:"",
+          ifDefault:""
+        },
         id: "",
         title: "",
         searchList: [],
