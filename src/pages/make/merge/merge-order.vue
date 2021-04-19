@@ -11,6 +11,7 @@
       </div>
       <Invoice :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
+               @getCompany="receiveCompany"
                @getInvoiceCategory="receiveCategory" @getInvoiceProperty="receiveProperty"></Invoice>
     </div>
     <div class="invoice-contents">
@@ -37,10 +38,10 @@
 </template>
 
 <script>
-  import {mergeMakeInvoice} from "../../../api/make";
+  import { mergeMakeInvoice } from "../../../api/make";
   import Header from "../../../components/Header.vue";
-  import {Toast} from "vant";
-  import {Dialog} from 'vant';
+  import { Toast } from "vant";
+  import { Dialog } from "vant";
   import Invoice from "../../../components/make/Invoice";
   import Receive from "../../../components/make/Receive";
   import makeMixins from "../mixins/make";
@@ -68,7 +69,7 @@
         invoiceForm: {
           type: "企业",
           category: "增值税电子普通发票",
-          property: localStorage.getItem("ifElectronic") === 'true' ? "电子" : "纸质",
+          property: localStorage.getItem("ifElectronic") === "true" ? "电子" : "纸质",
           purchaserName: "",
           purchaserTaxpayerNumber: "",
           purchaserAddress: "",
@@ -79,7 +80,7 @@
           email: "",
           remark: "",
           price: 0.0
-        },
+        }
       };
     },
     computed: {
@@ -106,21 +107,22 @@
        * 提交开票信息
        */
       makeInvoice() {
-        if (this.invoiceForm.type === '个人' && this.invoiceForm.purchaserName === "") {
+        if (this.invoiceForm.type === "个人" && this.invoiceForm.purchaserName === "") {
           return Toast("请输入发票抬头");
         }
-        this.checkEmailMobile()
+        this.checkEmailMobile();
         if (!this.ifCheckEmailMobile) {
           return;
         }
         Dialog.confirm({
-          title: '提示',
-          message: '确认抬头和金额正确并申请开票吗？',
+          title: "提示",
+          message: "确认抬头和金额正确并申请开票吗？"
         }).then(() => {
           Toast.loading({
-            message: '开票中...',
-            forbidClick: true,
+            message: "开票中...",
+            forbidClick: true
           });
+          this.invoiceForm.companyId = this.company.companyId;
           mergeMakeInvoice(this.invoiceForm).then((res) => {
             if (res.data.code === 1) {
               Toast.clear();
@@ -132,6 +134,9 @@
         }).catch(() => {
         });
       },
+      receiveCompany(val) {
+        this.company = val;
+      },
       changeElectronic() {
         this.invoiceForm.category = "增值税电子普通发票";
         this.invoiceForm.property = "电子";
@@ -139,7 +144,7 @@
       changePaper() {
         this.invoiceForm.property = "纸质";
         this.invoiceForm.category = "增值税普通发票";
-      },
+      }
     },
     watch: {},
     created() {
@@ -148,7 +153,7 @@
       }
     },
     activated() {
-      event.$on("select", function (data) {
+      event.$on("select", function(data) {
         this.address = data;
         this.$forceUpdate();
       });

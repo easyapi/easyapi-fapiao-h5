@@ -11,6 +11,7 @@
       </div>
       <Invoice :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
+               @getCompany="receiveCompany"
                @getInvoiceCategory="receiveCategory" @getInvoiceProperty="receiveProperty"></Invoice>
     </div>
     <div class="invoice-contents">
@@ -167,6 +168,9 @@
           this.calculatedAmount();
         });
       },
+      receiveCompany(val) {
+        this.company = val;
+      },
       makeInvoice() {
         if (this.invoiceForm.type === '个人') {
           if (this.invoiceForm.purchaserName == "") {
@@ -187,6 +191,7 @@
           this.invoiceForm.category = "增值税电子普通发票";
           this.invoiceForm.property = "电子";
           this.invoiceForm.outOrderIds = this.outOrder.outOrderId;
+          this.invoiceForm.companyId = this.company.companyId;
           mergeMakeInvoice(this.invoiceForm).then(res => {
             if (res.data.code === 1) {
               this.$messagebox.alert(res.data.message);

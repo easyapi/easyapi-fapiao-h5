@@ -11,6 +11,7 @@
       </div>
       <Invoice :isShow="isShow" :isHide="isHide" :ifElectronic="ifElectronic" :invoiceForm="invoiceForm"
                :ifPaper="ifPaper" :company="company"
+               @getCompany="receiveCompany"
                @getInvoiceCategory="receiveCategory" @getInvoiceProperty="receiveProperty"></Invoice>
     </div>
     <div class="invoice-contents">
@@ -46,10 +47,10 @@
 </template>
 
 <script>
-  import {queryShopOrder, getState} from "../../../api/query";
-  import {makeInvoice} from "../../../api/make";
-  import {Toast} from "vant";
-  import {Dialog} from "vant";
+  import { queryShopOrder, getState } from "../../../api/query";
+  import { makeInvoice } from "../../../api/make";
+  import { Toast } from "vant";
+  import { Dialog } from "vant";
   import Invoice from "../../../components/make/Invoice";
   import Receive from "../../../components/make/Receive";
   import makeMixins from "../mixins/make";
@@ -68,13 +69,13 @@
         isShow: false,
         ifElectronic: localStorage.getItem("ifElectronic"),
         ifPaper: localStorage.getItem("ifPaper"),
-        active: '商品明细',
+        active: "商品明细",
         list: [
           {
-            name: '商品明细'
+            name: "商品明细"
           },
           {
-            name: '商品类别'
+            name: "商品类别"
           }
         ],
         loadingList: true,
@@ -96,7 +97,7 @@
           email: "",
           remark: "",
           price: 0.0
-        },
+        }
       };
     },
     computed: {
@@ -106,7 +107,7 @@
     },
     methods: {
       showDetail(name) {
-        this.active = name
+        this.active = name;
       },
       goBack() {
         history.go(-1);
@@ -114,7 +115,7 @@
       getShopOrder() {
         getState(this.outOrderNo).then(res => {
           if (res.data.code === 1 && res.data.content) {
-            this.$router.replace({path: "/invoice/detail", query: {id: res.data.content[0].invoiceId}});
+            this.$router.replace({ path: "/invoice/detail", query: { id: res.data.content[0].invoiceId } });
           }
         });
         queryShopOrder(this.outOrderNo).then(res => {
@@ -124,8 +125,11 @@
           }
         });
       },
+      receiveCompany(val) {
+        this.company = val;
+      },
       makeInvoice() {
-        if (this.invoiceForm.type === '个人' && this.invoiceForm.purchaserName === "") {
+        if (this.invoiceForm.type === "个人" && this.invoiceForm.purchaserName === "") {
           return Toast("请输入发票抬头");
         }
         this.checkEmailMobile();
@@ -133,8 +137,8 @@
           return;
         }
         Dialog.confirm({
-          title: '提示',
-          message: '确认抬头正确并开票吗',
+          title: "提示",
+          message: "确认抬头正确并开票吗",
           showCancelButton: true
         }).then(action => {
           if (action === "confirm") {
@@ -142,17 +146,18 @@
             this.invoiceForm.property = "电子";
             this.invoiceForm.outOrderNo = this.outOrder.outOrderNo;
             this.invoiceForm.items = this.outOrder.items;
+            this.invoiceForm.companyId = this.company.companyId;
             makeInvoice(this.invoiceForm).then(res => {
               if (res.data.code === 1) {
                 Toast(res.data.message);
-                this.$router.go(0)
+                this.$router.go(0);
               }
             }).catch(error => {
               Toast(error.response.data.message);
             });
           }
         });
-      },
+      }
     },
     watch: {},
     created() {
@@ -176,7 +181,7 @@
     activated() {
     },
     mounted() {
-      this.getShopOrder()
+      this.getShopOrder();
     }
   };
 </script>
