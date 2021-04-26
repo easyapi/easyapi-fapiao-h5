@@ -10,21 +10,8 @@
           :key="index"
         >
           <div class="mint-cell-wrapper order-con">
-            <div class="mint-cell-title order-left">
-              <label class="mint-checklist-label">
-                  <span class="mint-checkbox">
-                    <input
-                      type="checkbox"
-                      checked='checked'
-                      disabled="disabled"
-                      class="mint-checkbox-input"
-                      v-model="item.satus"
-                      id
-                    />
-                    <span class="mint-checkbox-core"></span>
-                  </span>
-              </label>
-            </div>
+            <van-checkbox v-model="item.satus" shape="square" @change="itemChange">
+            </van-checkbox>
             <div class="order-right" @click="checked(index)">
               <van-cell-group :border="false">
                 <van-cell :title="'订单号：' + item.no" :border="false" class="orderNum"/>
@@ -46,20 +33,8 @@
         :key="index"
       >
         <div class="mint-cell-wrapper order-con">
-          <div class="mint-cell-title order-left">
-            <label class="mint-checklist-label">
-                  <span class="mint-checkbox">
-                    <input
-                      type="checkbox"
-                      class="mint-checkbox-input"
-                      v-model="item.satus"
-                      @change="itemChange()"
-                      id
-                    />
-                    <span class="mint-checkbox-core"></span>
-                  </span>
-            </label>
-          </div>
+          <van-checkbox v-model="item.satus" shape="square" @change="itemChange">
+          </van-checkbox>
           <div class="order-right" @click="checked(index)">
             <van-cell-group :border="false">
               <van-cell :title="'订单号：' + item.no" :border="false" class="orderNum"/>
