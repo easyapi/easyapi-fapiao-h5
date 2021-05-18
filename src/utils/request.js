@@ -1,7 +1,7 @@
-import axios from 'axios'
+import axios from "axios";
 import router from "../router/index";
 
-export const baseUrl = "https://fapiao-api.easyapi.com";
+export const baseUrl = process.env.VUE_APP_BASE_API;
 // export const baseUrl = "http://localhost:8888";
 
 axios.defaults.baseURL = baseUrl;

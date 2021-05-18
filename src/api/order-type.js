@@ -1,11 +1,9 @@
 import axios from 'axios'
 
-import {baseUrl} from "../utils/request";
-
 /**
  * 获取订单类型列表
  */
-export const getOrderTypeList = () => axios.get(`${baseUrl}/order-types`, {
+export const getOrderTypeList = () => axios.get(`${process.env.VUE_APP_BASE_API}/order-types`, {
   params: {
     accessToken: localStorage.getItem("accessToken")
   }

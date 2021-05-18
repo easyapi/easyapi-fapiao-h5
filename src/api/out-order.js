@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-import {baseUrl} from "../utils/request";
-
 /**
  * 获取未开票外部订单列表
  *
@@ -13,7 +11,7 @@ export const getOutOrderList = (params, page) => {
   params.state = 0;
   params.sort = "orderTime,desc";
   params.accessToken = localStorage.getItem("accessToken");
-  return axios.get(`${baseUrl}/out-orders`, {
+  return axios.get(`${process.env.VUE_APP_BASE_API}/out-orders`, {
     params: params
   });
 };
@@ -26,7 +24,7 @@ export const getOutOrderList = (params, page) => {
  */
 export const outOrderCount = (params) => {
   params.accessToken = localStorage.getItem("accessToken");
-  return axios.get(`${baseUrl}/out-order/count`, {
+  return axios.get(`${process.env.VUE_APP_BASE_API}/out-order/count`, {
     params: params
   });
 };

@@ -1,14 +1,11 @@
 import axios from 'axios'
 
-import {baseUrl} from "../utils/request";
-
-
 /**
  * 获取地址列表
  *
  * @see https://www.easyai.com
  */
-export const getAddressList = (params) => axios.get(`${baseUrl}/addresses`, {
+export const getAddressList = (params) => axios.get(`${process.env.VUE_APP_BASE_API}/addresses`, {
   params: {
     ...params,
     accessToken: localStorage.getItem("accessToken")
@@ -20,7 +17,7 @@ export const getAddressList = (params) => axios.get(`${baseUrl}/addresses`, {
  *
  * @see https://www.easyai.com
  */
-export const getAddress = (id) => axios.get(`${baseUrl}/address/${id}`, {
+export const getAddress = (id) => axios.get(`${process.env.VUE_APP_BASE_API}/address/${id}`, {
   params: {
     accessToken: localStorage.getItem("accessToken")
   }
@@ -34,7 +31,7 @@ export const getAddress = (id) => axios.get(`${baseUrl}/address/${id}`, {
 export const createAddress = (data) => {
   data.accessToken = localStorage.getItem("accessToken")
   data.ifDefault = true
-  return axios.post(`${baseUrl}/address`, data);
+  return axios.post(`${process.env.VUE_APP_BASE_API}/address`, data);
 };
 
 /**
@@ -45,7 +42,7 @@ export const createAddress = (data) => {
 export const updateAddress = (id, data) => {
   data.accessToken = localStorage.getItem("accessToken")
   data.ifDefault = true
-  return axios.put(`${baseUrl}/address/${id}`, data);
+  return axios.put(`${process.env.VUE_APP_BASE_API}/address/${id}`, data);
 };
 
 /**
@@ -53,7 +50,7 @@ export const updateAddress = (id, data) => {
  *
  * @see https://www.easyai.com
  */
-export const deleteAddress = id => axios.delete(`${baseUrl}/address/${id}`, {
+export const deleteAddress = id => axios.delete(`${process.env.VUE_APP_BASE_API}/address/${id}`, {
   data: {
     accessToken: localStorage.getItem("accessToken")
   }
@@ -62,7 +59,7 @@ export const deleteAddress = id => axios.delete(`${baseUrl}/address/${id}`, {
 /**
  * 获取我的默认地址信息
  */
-export const getDefaultAddress = username => axios.get(`${baseUrl}/address/${username}/default`, {
+export const getDefaultAddress = username => axios.get(`${process.env.VUE_APP_BASE_API}/address/${username}/default`, {
   params: {
     accessToken: localStorage.getItem("accessToken")
   }
@@ -73,7 +70,7 @@ export const getDefaultAddress = username => axios.get(`${baseUrl}/address/${use
  *
  * @see https://www.easyai.com
  */
-export const defaultAddress = id => axios.put(`${baseUrl}/address/${id}`, {
+export const defaultAddress = id => axios.put(`${process.env.VUE_APP_BASE_API}/address/${id}`, {
   accessToken: localStorage.getItem("accessToken"),
   ifDefault: true
 });

@@ -1,6 +1,5 @@
 import axios from 'axios'
 
-import {baseUrl} from "../utils/request";
 
 /**
  * 获取发票自定义分类列表
@@ -10,7 +9,7 @@ import {baseUrl} from "../utils/request";
 export const getCustomCategoryList = (params) => {
   params.accessToken = localStorage.getItem("accessToken")
   params.taxNumber = localStorage.getItem("taxNumber")
-  return axios.get(`${baseUrl}/custom-categories`, {
+  return axios.get(`${process.env.VUE_APP_BASE_API}/custom-categories`, {
     params: params
   });
 }

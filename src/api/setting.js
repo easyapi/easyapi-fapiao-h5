@@ -1,7 +1,4 @@
 import axios from 'axios'
-
-import {baseUrl} from "../utils/request";
-
 /**
  * 查询设置信息
  *
@@ -9,7 +6,7 @@ import {baseUrl} from "../utils/request";
  */
 export const findSetting = (params) => {
   params.accessToken = localStorage.getItem("accessToken");
-  return axios.get(`${baseUrl}/setting/find`, {
+  return axios.get(`${process.env.VUE_APP_BASE_API}/setting/find`, {
     params: params
   });
 };

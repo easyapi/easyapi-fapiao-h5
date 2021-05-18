@@ -1,13 +1,11 @@
 import axios from 'axios'
 
-import {baseUrl} from "../utils/request";
-
 /**
  * 获取公司抬头列表
  *
  * @see https://www.easyai.com
  */
-export const getCompanyList = (params) => axios.get(`${baseUrl}/companies`, {
+export const getCompanyList = (params) => axios.get(`${process.env.VUE_APP_BASE_API}/companies`, {
   params: {
     ...params,
     accessToken: localStorage.getItem("accessToken")
@@ -19,7 +17,7 @@ export const getCompanyList = (params) => axios.get(`${baseUrl}/companies`, {
  *
  * @see https://www.easyai.com
  */
-export const getCompany = (id) => axios.get(`${baseUrl}/company/${id}`, {
+export const getCompany = (id) => axios.get(`${process.env.VUE_APP_BASE_API}/company/${id}`, {
   params: {
     accessToken: localStorage.getItem("accessToken")
   }
@@ -33,7 +31,7 @@ export const getCompany = (id) => axios.get(`${baseUrl}/company/${id}`, {
 export const createCompany = (data) => {
   data.accessToken = localStorage.getItem("accessToken")
   data.ifDefault = true
-  return axios.post(`${baseUrl}/company`, data);
+  return axios.post(`${process.env.VUE_APP_BASE_API}/company`, data);
 };
 
 /**
@@ -44,7 +42,7 @@ export const createCompany = (data) => {
 export const updateCompany = (id, data) => {
   data.accessToken = localStorage.getItem("accessToken")
   data.ifDefault = true
-  return axios.put(`${baseUrl}/company/${id}`, data);
+  return axios.put(`${process.env.VUE_APP_BASE_API}/company/${id}`, data);
 };
 
 /**
@@ -52,7 +50,7 @@ export const updateCompany = (id, data) => {
  *
  * @see https://www.easyai.com
  */
-export const deleteCompany = id => axios.delete(`${baseUrl}/company/${id}`, {
+export const deleteCompany = id => axios.delete(`${process.env.VUE_APP_BASE_API}/company/${id}`, {
   data: {
     accessToken: localStorage.getItem("accessToken")
   }
@@ -64,7 +62,7 @@ export const deleteCompany = id => axios.delete(`${baseUrl}/company/${id}`, {
  *
  * @see https://www.easyai.com
  */
-export const defaultCompany = id => axios.put(`${baseUrl}/company/${id}`, {
+export const defaultCompany = id => axios.put(`${process.env.VUE_APP_BASE_API}/company/${id}`, {
   accessToken: localStorage.getItem("accessToken"),
   ifDefault: true
 });
@@ -74,7 +72,7 @@ export const defaultCompany = id => axios.put(`${baseUrl}/company/${id}`, {
  *
  * @see https://www.easyai.com
  */
-export const getDefaultCompany = () => axios.get(`${baseUrl}/company/default`, {
+export const getDefaultCompany = () => axios.get(`${process.env.VUE_APP_BASE_API}/company/default`, {
   params: {
     accessToken: localStorage.getItem("accessToken")
   }
@@ -86,7 +84,7 @@ export const getDefaultCompany = () => axios.get(`${baseUrl}/company/default`, {
  *
  * @see https://www.easyai.com
  */
-export const getCompanyCodeList = (params) => axios.get(`${baseUrl}/company/codes`, {
+export const getCompanyCodeList = (params) => axios.get(`${process.env.VUE_APP_BASE_API}/company/codes`, {
   params,
   accessToken: localStorage.getItem("accessToken")
 });

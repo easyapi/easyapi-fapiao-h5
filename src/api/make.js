@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-import {baseUrl} from "../utils/request";
-
 /**
  * 开具发票
  *
@@ -9,7 +7,7 @@ import {baseUrl} from "../utils/request";
  */
 export const makeInvoice = (data) => {
   data.accessToken = localStorage.getItem("accessToken")
-  return axios.post(`${baseUrl}/invoice/make`, data);
+  return axios.post(`${process.env.VUE_APP_BASE_API}/invoice/make`, data);
 };
 
 
@@ -20,7 +18,7 @@ export const makeInvoice = (data) => {
  */
 export const mergeMakeInvoice = (data) => {
   data.accessToken = localStorage.getItem("accessToken")
-  return axios.post(`${baseUrl}/merge-make`, data);
+  return axios.post(`${process.env.VUE_APP_BASE_API}/merge-make`, data);
 };
 
 
@@ -32,7 +30,7 @@ export const mergeMakeInvoice = (data) => {
 export const categoryMakeInvoice = (data) => {
   data.accessToken = localStorage.getItem("accessToken")
   data.taxNumber = localStorage.getItem("taxNumber")
-  return axios.post(`${baseUrl}/invoice/category/make`, data);
+  return axios.post(`${process.env.VUE_APP_BASE_API}/invoice/category/make`, data);
 };
 
 
@@ -43,5 +41,5 @@ export const categoryMakeInvoice = (data) => {
  */
 export const productMakeInvoice = (data) => {
   data.accessToken = localStorage.getItem("accessToken")
-  return axios.post(`${baseUrl}/invoice/product/make`, data);
+  return axios.post(`${process.env.VUE_APP_BASE_API}/invoice/product/make`, data);
 };

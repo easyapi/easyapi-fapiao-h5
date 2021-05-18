@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-import {baseUrl} from "../utils/request";
-
 /**
  * 获取商品列表
  *
@@ -11,7 +9,7 @@ export const getProductList = (searchParams) => {
   let params = {...searchParams};
   params.size = 100
   params.accessToken = localStorage.getItem("accessToken")
-  return axios.get(`${baseUrl}/products`, {
+  return axios.get(`${process.env.VUE_APP_BASE_API}/products`, {
     params: params
   });
 }
