@@ -10,8 +10,10 @@
           :key="index"
         >
           <div class="mint-cell-wrapper order-con">
-            <van-checkbox v-model="item.satus" shape="square" @change="itemChange">
-            </van-checkbox>
+            <div>
+              <van-checkbox icon-size="15px" v-model="item.satus" shape="square" @change="itemChange">
+              </van-checkbox>
+            </div>
             <div class="order-right" @click="checked(index)">
               <van-cell-group :border="false">
                 <van-cell :title="'订单号：' + item.no" :border="false" class="orderNum"/>
@@ -33,8 +35,10 @@
         :key="index"
       >
         <div class="mint-cell-wrapper order-con">
-          <van-checkbox v-model="item.satus" shape="square" @change="itemChange">
-          </van-checkbox>
+          <div style="margin-top: 7px">
+            <van-checkbox icon-size="15px" v-model="item.satus" shape="square" @change="itemChange">
+            </van-checkbox>
+          </div>
           <div class="order-right" @click="checked(index)">
             <van-cell-group :border="false">
               <van-cell :title="'订单号：' + item.no" :border="false" class="orderNum"/>

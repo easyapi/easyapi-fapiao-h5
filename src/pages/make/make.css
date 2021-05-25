@@ -252,9 +252,10 @@
   background: white;
 }
 
-.mint-cell-wrapper{
+.mint-cell-wrapper {
   background: white;
   margin-bottom: 15px;
+  display: flex;
 }
 
 .mint-checklist-label {
