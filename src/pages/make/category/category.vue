@@ -67,13 +67,12 @@
 </template>
 
 <script>
-  import {getQiniuToken, getQiniuKey} from "../../../api/qiniu";
+  import {getQiniuToken, getQiniuKey, qiniuUpload} from "../../../api/qiniu";
   import {getCustomCategoryList} from "../../../api/custom-category";
   import {getShopSupport} from "../../../api/shop";
   import {categoryMakeInvoice} from "../../../api/make";
   import {Toast} from "vant";
   import {Dialog} from "vant";
-  import axios from "axios";
   import Invoice from "../../../components/make/Invoice";
   import Receive from "../../../components/make/Receive";
   import makeMixins from "../mixins/make";
@@ -144,12 +143,7 @@
         data.append("token", qnToken);     //七牛需要的token，后台获取
         data.append("key", qnKey);
         data.append("file", file["file"]);
-        axios({
-          method: "POST",
-          url: "https://upload.qiniup.com/",  //上传地址
-          data: data,
-          timeout: 30000      //超时时间，因为图片上传时间有可能比较长
-        }).then(res => {
+        qiniuUpload(data).then(res => {
           this.fieldValue = "https://qiniu.easyapi.com/" + res.data.key;
         });
       },

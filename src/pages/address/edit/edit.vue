@@ -43,7 +43,7 @@
   import {Dialog} from "vant";
   import {Toast} from "vant";
   import {getAddress, createAddress, updateAddress, deleteAddress} from "../../../api/address";
-  import axios from "axios";
+  import {getAreaList} from "../../../api/area";
 
   export default {
     name: "EditAddress",
@@ -64,15 +64,7 @@
 
     methods: {
       getAreaList() {
-        axios({
-          url: "https://qiniu.easyapi.com/area.json",
-          dataType: "json",
-          async: true,
-          type: "GET"
-        }).then(res => {
-          if (res.data.status == 1) {
-          }
-        });
+        getAreaList().then()
       },
       goBack() {
         history.go(-1);

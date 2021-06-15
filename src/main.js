@@ -10,9 +10,9 @@ import clipboard from "clipboard";
 import VueWechatTitle from "vue-wechat-title";
 import "./assets/css/resetVantUI.css";
 import "@vant/touch-emulator";
-import infiniteScroll from 'vue-infinite-scroll'
+import infiniteScroll from 'vue-infinite-scroll';
 
-Vue.use(infiniteScroll)
+Vue.use(infiniteScroll);
 Vue.use(Vant);
 Vue.prototype.clipboard = clipboard;
 Vue.use(VueWechatTitle);

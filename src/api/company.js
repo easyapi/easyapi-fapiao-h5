@@ -29,8 +29,8 @@ export const getCompany = (id) => axios.get(`${process.env.VUE_APP_BASE_API}/com
  * @see https://www.easyai.com
  */
 export const createCompany = (data) => {
-  data.accessToken = localStorage.getItem("accessToken")
-  data.ifDefault = true
+  data.accessToken = localStorage.getItem("accessToken");
+  data.ifDefault = true;
   return axios.post(`${process.env.VUE_APP_BASE_API}/company`, data);
 };
 
@@ -40,8 +40,8 @@ export const createCompany = (data) => {
  * @see https://www.easyai.com
  */
 export const updateCompany = (id, data) => {
-  data.accessToken = localStorage.getItem("accessToken")
-  data.ifDefault = true
+  data.accessToken = localStorage.getItem("accessToken");
+  data.ifDefault = true;
   return axios.put(`${process.env.VUE_APP_BASE_API}/company/${id}`, data);
 };
 
