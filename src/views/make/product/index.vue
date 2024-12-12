@@ -1,4 +1,8 @@
 <script setup lang="ts">
+import make from '@/api/make'
+import product from '@/api/product'
+import { useStore } from '@/stores'
+import { localStorage } from '@/utils/local-storage'
 import {
   closeToast,
   showConfirmDialog,
@@ -6,10 +10,6 @@ import {
   showToast,
 } from 'vant'
 import makeMixins from '../mixins/make'
-import product from '@/api/product'
-import make from '@/api/make'
-import { localStorage } from '@/utils/local-storage'
-import { useStore } from '@/stores'
 
 const { common, getInvoiceRemark, ifNeedMobileEmail, checkEmailMobile }
   = makeMixins()
@@ -203,14 +203,11 @@ onMounted(() => {
     <Invoice
       :is-show="state.isShow"
       :is-hide="state.isHide"
-
       :invoice-form="state.invoiceForm"
-
       :company="state.company"
       @get-company="receiveCompany"
       @get-invoice-category="receiveCategory"
     />
-
     <div class="invoice-contents">
       <p class="contents-title">
         发票内容
@@ -266,7 +263,6 @@ onMounted(() => {
         />
       </div>
     </div>
-
     <Receive
       :invoice-form="state.invoiceForm"
       :if-need-email="common.ifNeedEmail"
@@ -278,7 +274,6 @@ onMounted(() => {
         提交
       </van-button>
     </div>
-
     <van-dialog />
     <van-popup
       v-model:show="state.showPopup"
