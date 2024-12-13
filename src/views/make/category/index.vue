@@ -49,8 +49,8 @@ const state = reactive({
     extends: [],
     customCategoryId: null,
     companyId: null,
-    specificBusiness: [],
-    specificBusinessCode: '',
+    // specificBusiness: [],
+    // specificBusinessCode: '',
   },
   init: false,
   tripData: null,
@@ -113,7 +113,7 @@ function getCustomCategoryList() {
     if (res.code === 1) {
       state.customCategoryList = res.content
       state.customCategoryList.forEach((item) => {
-        state.invoiceForm.specificBusinessCode = item.specificBusinessCode
+        // state.invoiceForm.specificBusinessCode = item.specificBusinessCode
         item.text = item.name
         item.value = item.customCategoryId
         if (item.ifDefault) {
@@ -145,11 +145,11 @@ function makeInvoice() {
 
   if (!checkEmailMobile(state.invoiceForm))
     return
-  if (state.invoiceForm.specificBusinessCode === '09') {
-    state.tripData.forEach((item) => {
-      state.invoiceForm.specificBusiness.push(item)
-    })
-  }
+  // if (state.invoiceForm.specificBusinessCode === '09') {
+  //   state.tripData.forEach((item) => {
+  //     state.invoiceForm.specificBusiness.push(item)
+  //   })
+  // }
   showConfirmDialog({
     title: '提示',
     message: '确认抬头和金额正确并申请开票吗？',
@@ -284,7 +284,7 @@ onMounted(async () => {
         />
       </van-cell>
     </van-cell-group>
-    <TripPeople v-if="state.invoiceForm.specificBusinessCode === '09'" @get-trip-people="getTripPeople" />
+    <!-- <TripPeople v-if="state.invoiceForm.specificBusinessCode === '09'" @get-trip-people="getTripPeople" /> -->
     <Receive
       v-if="state.init"
       :invoice-form="state.invoiceForm"
