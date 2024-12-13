@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { closeToast, showLoadingToast, showToast } from 'vant'
-import wx from 'jweixin-1.6.0'
 import company from '@/api/company'
-import { useStore } from '@/stores'
 import config from '@/api/config'
+import { useStore } from '@/stores'
+import wx from 'jweixin-1.6.0'
+import { closeToast, showLoadingToast, showToast } from 'vant'
 
 const store = useStore()
 const router = useRouter()

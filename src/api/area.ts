@@ -6,12 +6,8 @@ const area = {
    *
    * @see https://www.easyapi.com
    */
-  getAreaList(params: any): Promise<any> {
-    return request.get('https://qiniu.easyapi.com/area.json', {
-      params: {
-        ...params,
-      },
-    })
+  getAreaList(): Promise<any> {
+    return request.get('https://qiniu.easyapi.com/area.json')
   },
 }
 

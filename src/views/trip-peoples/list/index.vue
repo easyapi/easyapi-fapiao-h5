@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import travelers from '@/api/travelers'
-import { useTripDataStore } from '@/stores'
+import { useStore } from '@/stores'
 import { idTypes, vehicleTypes } from '@/utils/business'
 import { closeToast, showConfirmDialog, showLoadingToast, showToast } from 'vant'
 
-const store = useTripDataStore()
+const store = useStore()
 const route = useRoute()
 
 const state = reactive({
@@ -78,43 +78,50 @@ function select(item) {
  * 选择出行人
  */
 function selectTripPeople() {
+  if (state.tripPeoplesList.length === 0) {
+    showToast('您还未添加出行人,请先添加出行人')
+    history.back()
+    return
+  }
+  if (!state.tripPeoplesData.travelerId) {
+    showToast('您还未选择出行人')
+    return
+  }
   showConfirmDialog({
     title: '提示',
     message: '确定选择吗？',
   })
     .then(() => {
-      if (state.tripPeoplesList.length === 0) {
-        showToast('您还未添加出行人')
-        history.back()
-        return
-      }
-      store.setTripPeoplesData(state.tripPeoplesData, route.params.id)
-      store.ifTripData(true)
+      const index = route.query.selectId
+      const tripPeoplesData = JSON.parse(localStorage.getItem('tripPeopleData'))
+      tripPeoplesData[index] = state.tripPeoplesData
+      localStorage.setItem('tripPeopleData', JSON.stringify(tripPeoplesData))
+      showToast('选择成功')
+      history.back()
     })
 }
 
 function deleteTripPeople() {
+  if (state.tripPeoplesList.length === 0) {
+    showToast('您还未添加出行人,请先添加出行人')
+    history.back()
+    return
+  }
+  if (!state.tripPeoplesData.travelerId) {
+    showToast('您还未选择出行人')
+    return
+  }
   showConfirmDialog({
     title: '提示',
     message: '确定删除出行人吗？',
   })
     .then(() => {
-      if (state.tripPeoplesList.length === 0) {
-        showToast('您还未添加出行人')
-        history.back()
-        return
-      }
-      else if (!state.tripPeoplesData.travelerId) {
-        showToast('您还未选择出行人')
-        return
-      }
       travelers.deleteTravelers(state.tripPeoplesData.travelerId).then((res) => {
         state.loading = false
         closeToast()
         if (res.code === 1) {
           showToast('删除成功')
           getTravelers()
-          store.setTripPeoplesData({}, route.params.id)
         }
         else {
           showToast(res.message)
@@ -146,7 +153,6 @@ function deleteIdTypeAndVehicle() {
 onMounted(() => {
   document.title = '出行人管理'
   getTravelers()
-  state.tripPeoplesData = store.tripPeoplesData || {}
 })
 </script>
 

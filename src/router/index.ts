@@ -137,7 +137,7 @@ const routes = [
     component: mallOrderYouZan,
   },
   {
-    path: '/trip-peoples/list/:id',
+    path: '/trip-peoples/list',
     name: 'tripPeoplesList',
     component: tripPeoplesList,
   },

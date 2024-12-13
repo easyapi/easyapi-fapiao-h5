@@ -12,7 +12,7 @@ const travelers = {
         accessToken: localStorage.get('accessToken'),
         ...params,
       },
-    }, params)
+    })
   },
 
   /**

@@ -1,8 +1,8 @@
 <script setup lang='ts'>
-import { showConfirmDialog } from 'vant'
 import address from '@/api/address'
 import area from '@/api/area'
 import { useStore } from '@/stores'
+import { showConfirmDialog } from 'vant'
 
 const store = useStore()
 
@@ -41,7 +41,7 @@ function getAddress() {
  * 获取省市区列表
  */
 function getAreaList() {
-  area.getAreaList({}).then((res) => {
+  area.getAreaList().then((res) => {
     if (res.status === '1') {
       const provinces = res.provinces
       const province_list = {}

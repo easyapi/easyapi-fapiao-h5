@@ -2,7 +2,6 @@
 import customCategory from '@/api/custom-category'
 import make from '@/api/make'
 import qiniu from '@/api/qiniu'
-// import TripPeople from '@/components/make/TripPeople.vue'
 import { useStore } from '@/stores'
 import { localStorage } from '@/utils/local-storage'
 import { validPrice } from '@/utils/validate'
@@ -14,7 +13,6 @@ const store = useStore()
 const router = useRouter()
 const route = useRoute()
 
-// const tripPeopleInfo = ref(null)
 const state = reactive({
   showCustomCategory: false,
   keyboardShow: false,
@@ -51,8 +49,8 @@ const state = reactive({
     extends: [],
     customCategoryId: null,
     companyId: null,
-    // specificBusiness: [],
-    // specificBusinessCode: '',
+    specificBusiness: [],
+    specificBusinessCode: '',
   },
   init: false,
   tripData: null,
@@ -115,7 +113,7 @@ function getCustomCategoryList() {
     if (res.code === 1) {
       state.customCategoryList = res.content
       state.customCategoryList.forEach((item) => {
-        // state.invoiceForm.specificBusinessCode = item.specificBusinessCode
+        state.invoiceForm.specificBusinessCode = item.specificBusinessCode
         item.text = item.name
         item.value = item.customCategoryId
         if (item.ifDefault) {
@@ -147,14 +145,11 @@ function makeInvoice() {
 
   if (!checkEmailMobile(state.invoiceForm))
     return
-  // if (state.invoiceForm.specificBusinessCode === '09') {
-  //   state.tripData.forEach((item) => {
-  //     if (item.travelDateFormatter) {
-  //       item.tripPeopleForm.travelDate = `${item.travelDateFormatter[0]}-${item.travelDateFormatter[1]}-${item.travelDateFormatter[2]}`
-  //     }
-  //     state.invoiceForm.specificBusiness.push(item.tripPeopleForm)
-  //   })
-  // }
+  if (state.invoiceForm.specificBusinessCode === '09') {
+    state.tripData.forEach((item) => {
+      state.invoiceForm.specificBusiness.push(item)
+    })
+  }
   showConfirmDialog({
     title: '提示',
     message: '确认抬头和金额正确并申请开票吗？',
@@ -201,9 +196,10 @@ function onConfirm(value) {
   state.showCustomCategory = false
 }
 
-// function getTripPeople(data) {
-//   state.tripData = data
-// }
+function getTripPeople(data) {
+  state.tripData = data
+  localStorage.set('tripPeopleData', state.tripData)
+}
 
 onMounted(async () => {
   if (route.query.accessToken)
@@ -288,7 +284,7 @@ onMounted(async () => {
         />
       </van-cell>
     </van-cell-group>
-    <!-- <TripPeople v-if="state.invoiceForm.specificBusinessCode === '09' " ref="tripPeopleInfo" @get-trip-people="getTripPeople" /> -->
+    <TripPeople v-if="state.invoiceForm.specificBusinessCode === '09'" @get-trip-people="getTripPeople" />
     <Receive
       v-if="state.init"
       :invoice-form="state.invoiceForm"

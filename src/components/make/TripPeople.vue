@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import area from '@/api/area'
-import { useTripDataStore } from '@/stores'
 import { idTypes, planeLevels, shippingLevels, trainLevels, vehicleTypes } from '@/utils/business'
 import { showToast } from 'vant'
 
@@ -10,6 +9,7 @@ const state = reactive({
   ifDefault: true,
   show: false, // 控制显示出行人信息
   hide: true,
+  tripData: [],
   invoiceForm: [
     {
       tripPeopleForm: {},
@@ -31,7 +31,7 @@ const state = reactive({
       travelDateFormatter: [now.getFullYear(), now.getMonth() + 1, now.getDate()],
       showPicker: false,
     },
-  ],
+  ] as any,
 })
 
 const router = useRouter()
@@ -117,9 +117,7 @@ function areaListData(data) {
  * 前往抬头管理页
  */
 function gotoTripPeoples(id: any) {
-  router.push({
-    path: `/trip-peoples/list/${id}`,
-  })
+  router.push({ path: '/trip-peoples/list', query: { selectId: id } })
 }
 
 /**
@@ -140,9 +138,11 @@ function ifShowSelect(item) {
 function addTripPeople() {
   state.invoiceForm.push({
     tripPeopleForm: {},
+    travelDateFormatter: [now.getFullYear(), now.getMonth() + 1, now.getDate()],
   })
   getAreaList()
-  sessionStorage.setItem('tripPeopleData', JSON.stringify(state.invoiceForm))
+  getDefaultDate()
+  getTripPeopleForm()
 }
 
 function deleteTripPeople(index) {
@@ -151,15 +151,13 @@ function deleteTripPeople(index) {
     return
   }
   state.invoiceForm.splice(index, 1)
-  showToast('删除成功')
-  sessionStorage.setItem('tripPeopleData', JSON.stringify(state.invoiceForm))
+  getTripPeopleForm()
 }
 
 /**
  * 选择出行日期
  */
 function selectDate(item) {
-  showToast('选择日期成功')
   item.showPicker = false
   item.tripPeopleForm.travelDate = item.travelDateFormatter.join('-')
 }
@@ -171,35 +169,56 @@ function showIdTypeAndVehicle() {
   state.invoiceForm.forEach((item) => {
     const idType = idTypes.find(type => type.value == item.tripPeopleForm?.idType)
     const vehicleType = vehicleTypes.find(type => type.value === item.tripPeopleForm?.vehicleType)
-
     item.pickerValueOne = idType ? idType.text : ''
     item.pickerValueTwo = vehicleType ? vehicleType.text : ''
   })
 }
 
-const tripStore = useTripDataStore()
+/**
+ * 获取默认时间
+ */
+function getDefaultDate() {
+  state.invoiceForm.forEach((item) => {
+    item.tripPeopleForm.travelDate = item.travelDateFormatter.join('-')
+  })
+}
+
+/**
+ * 遍历invoiceForm获取tripPeopleForm
+ */
+function getTripPeopleForm() {
+  const tripPeopleFormList = []
+  state.invoiceForm.forEach((item) => {
+    tripPeopleFormList.push(item.tripPeopleForm)
+  })
+  localStorage.setItem('tripPeopleData', JSON.stringify(tripPeopleFormList))
+}
 
 onMounted(() => {
-  if (sessionStorage.getItem('tripPeopleData')) {
-    state.invoiceForm = JSON.parse(sessionStorage.getItem('tripPeopleData'))
+  if (localStorage.getItem('tripPeopleData')) {
+    state.tripData = JSON.parse(localStorage.getItem('tripPeopleData'))
+    state.tripData.forEach((item, index) => {
+      if (!state.invoiceForm[index]) {
+        state.invoiceForm.push({ tripPeopleForm: {}, travelDateFormatter: [now.getFullYear(), now.getMonth() + 1, now.getDate()] })
+        state.invoiceForm[index].tripPeopleForm = item
+      }
+      else {
+        state.invoiceForm[index].tripPeopleForm = item
+      }
+    })
   }
   getAreaList()
   showIdTypeAndVehicle()
-  state.invoiceForm[tripStore.index].tripPeopleForm = tripStore.tripPeoplesData
-  sessionStorage.setItem('tripPeopleData', JSON.stringify(state.invoiceForm))
+  getDefaultDate()
+  getTripPeopleForm()
 })
 
 /**
  * 监控变化一旦变化更改数据
  */
 watch(() => state.invoiceForm, () => {
-  emit('getTripPeople', state.invoiceForm)
-}, { deep: true })
-
-watch(() => tripStore.ifSelectTripData, () => {
-  if (tripStore.ifSelectTripData) {
-    state.invoiceForm[tripStore.index].tripPeopleForm = tripStore.tripPeoplesData
-  }
+  getTripPeopleForm()
+  emit('getTripPeople', JSON.parse(localStorage.getItem('tripPeopleData')))
 }, { deep: true })
 </script>
 
@@ -229,7 +248,6 @@ watch(() => tripStore.ifSelectTripData, () => {
       <van-date-picker
         v-model="item.travelDateFormatter"
         title="选择出行日期"
-        option-height="100"
         @cancel="item.showPicker = false"
         @confirm="selectDate(item)"
       />
@@ -328,7 +346,7 @@ watch(() => tripStore.ifSelectTripData, () => {
         :readonly="ifShowSelect(item)"
         clickable
         label="等级"
-        placeholder="请填写或选择等级"
+        :placeholder="ifShowSelect(item) ? '请选择等级' : '请填写等级'"
       >
         <template #right-icon>
           <van-icon v-if="ifShowSelect(item)" name="arrow" @click="item.showLevel = true" />
@@ -354,12 +372,12 @@ watch(() => tripStore.ifSelectTripData, () => {
           @confirm="onConfirm($event, 3, item)"
         />
       </van-popup>
-      <a class="tripButton" @click="addTripPeople">
-        添加出行人
-      </a>
-      <a class="tripButton" @click="deleteTripPeople(index)">
-        删除出行人
-      </a>
+    </div>
+    <div class="tripButton create" @click="addTripPeople">
+      添加出行人
+    </div>
+    <div class="tripButton delete" @click="deleteTripPeople(index)">
+      删除出行人
     </div>
   </van-cell-group>
 </template>
@@ -369,7 +387,15 @@ watch(() => tripStore.ifSelectTripData, () => {
   display: flex;
   justify-content: center;
   cursor: pointer;
-  color: #969799;
-  padding: 10px 0;
+  padding: 15px 0;
+}
+
+.create{
+  color: #1989fa;
+}
+
+.delete{
+  margin-top: -15px;
+  color: #ee0a24;
 }
 </style>
