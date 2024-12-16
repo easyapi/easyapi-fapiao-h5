@@ -4,33 +4,12 @@ import travelers from '@/api/travelers'
 import { idTypes, planeLevels, shippingLevels, trainLevels, vehicleTypes } from '@/utils/business'
 import { showConfirmDialog, showToast } from 'vant'
 
-const emit = defineEmits(['update:invoiceForm'])
+const emit = defineEmits(['getTripPeople'])
 const now = new Date()
 const state = reactive({
   ifDefault: true,
   tripData: [],
-  invoiceForm: [
-    {
-      tripPeopleForm: {},
-      // 展示和隐藏下拉框
-      showPopup: false,
-      showCascader: false,
-      showCascaderTwo: false,
-      showVehicle: false,
-      showLevel: false,
-
-      cascaderValue: '',
-      cascaderTwoValue: '',
-      areaList: [] as any,
-      areaListTwo: [] as any,
-      pickerValueOne: '',
-      pickerValueTwo: '',
-      idTypeList: [],
-      vehicleTypeList: [],
-      travelDateFormatter: [now.getFullYear(), now.getMonth() + 1, now.getDate()],
-      showPicker: false,
-    },
-  ] as any,
+  invoiceForm: [] as any,
 })
 
 const router = useRouter()
@@ -133,10 +112,6 @@ function addTripPeople() {
 }
 
 function deleteTripPeople(index) {
-  if (state.invoiceForm.length === 1) {
-    showToast('至少填写一位出行人')
-    return
-  }
   showConfirmDialog({
     title: '提示',
     message: '您确定删除出行人吗？',
@@ -254,23 +229,29 @@ function ifShowSelectLevel(item) {
 }
 
 onMounted(() => {
-  if (localStorage.getItem('tripPeopleData')) {
-    state.tripData = JSON.parse(localStorage.getItem('tripPeopleData'))
-    state.tripData.forEach((item, index) => {
-      if (!state.invoiceForm[index]) {
-        state.invoiceForm.push({ tripPeopleForm: {}, travelDateFormatter: [now.getFullYear(), now.getMonth() + 1, now.getDate()] })
-        state.invoiceForm[index].tripPeopleForm = item
-      }
-      else {
-        state.invoiceForm[index].tripPeopleForm = item
-      }
-    })
+  if (localStorage.getItem('ifUseTripPeopleInfo')) {
+    if (localStorage.getItem('tripPeopleData')) {
+      state.tripData = JSON.parse(localStorage.getItem('tripPeopleData'))
+      state.tripData.forEach((item, index) => {
+        if (!state.invoiceForm[index]) {
+          state.invoiceForm.push({ tripPeopleForm: {}, travelDateFormatter: [now.getFullYear(), now.getMonth() + 1, now.getDate()] })
+          state.invoiceForm[index].tripPeopleForm = item
+        }
+        else {
+          state.invoiceForm[index].tripPeopleForm = item
+        }
+      })
+    }
+    findFieldKeyList()
+    getAreaList()
+    showIdTypeAndVehicle()
+    getDefaultDate()
+    getTripPeopleForm()
   }
-  findFieldKeyList()
-  getAreaList()
-  showIdTypeAndVehicle()
-  getDefaultDate()
-  getTripPeopleForm()
+})
+
+onUnmounted(() => {
+  localStorage.removeItem('ifUseTripPeopleInfo')
 })
 
 /**
@@ -284,12 +265,7 @@ watch(() => state.invoiceForm, () => {
 
 <template>
   <van-cell-group v-for="(item, index) in state.invoiceForm" :key="index" :title="`出行人${index + 1}信息`" inset>
-    <van-field
-      v-model="item.tripPeopleForm.traveler"
-      clickable
-      label="出行人"
-      placeholder="请输入出行人"
-    >
+    <van-field v-model="item.tripPeopleForm.traveler" clickable label="出行人" placeholder="请输入出行人">
       <template #right-icon>
         <text class="create selectText" @click="gotoTripPeoples(index)">
           选择出行人
@@ -297,12 +273,7 @@ watch(() => state.invoiceForm, () => {
       </template>
     </van-field>
     <van-field
-      v-model="item.tripPeopleForm.travelDate"
-      clickable
-      required
-      label="出行日期"
-      readonly
-      placeholder="请选择出行日期"
+      v-model="item.tripPeopleForm.travelDate" clickable required label="出行日期" readonly placeholder="请选择出行日期"
       @click="item.showPicker = true"
     >
       <template #right-icon>
@@ -311,18 +282,12 @@ watch(() => state.invoiceForm, () => {
     </van-field>
     <van-popup v-model:show="item.showPicker" position="bottom" round style="height: 50% ">
       <van-date-picker
-        v-model="item.travelDateFormatter"
-        title="选择出行日期"
-        @cancel="item.showPicker = false"
+        v-model="item.travelDateFormatter" title="选择出行日期" @cancel="item.showPicker = false"
         @confirm="selectDate(item)"
       />
     </van-popup>
     <van-field
-      v-model="item.pickerValueOne"
-      clickable
-      label="证件类型"
-      readonly
-      placeholder="请选择证件类型"
+      v-model="item.pickerValueOne" clickable label="证件类型" readonly placeholder="请选择证件类型"
       @click="item.showPopup = true"
     >
       <template #right-icon>
@@ -331,26 +296,15 @@ watch(() => state.invoiceForm, () => {
     </van-field>
     <van-popup v-model:show="item.showPopup" round position="bottom">
       <van-picker
-        v-model="item.idTypeList"
-        :columns="idTypes"
-        @cancel="item.showPopup = false"
+        v-model="item.idTypeList" :columns="idTypes" @cancel="item.showPopup = false"
         @confirm="onConfirm($event, 1, item)"
       />
     </van-popup>
     <van-field
-      v-model="item.tripPeopleForm.idNumber"
-      clickable
-      label="证件号码"
-      placeholder="请填写证件号码"
-      maxlength="20"
+      v-model="item.tripPeopleForm.idNumber" clickable label="证件号码" placeholder="请填写证件号码" maxlength="20"
       @update:model-value="tipInfo"
     />
-    <van-field
-      v-model="item.tripPeopleForm.travelDeparturePlace"
-      clickable
-      label="出发地"
-      placeholder="请出入出发地"
-    >
+    <van-field v-model="item.tripPeopleForm.travelDeparturePlace" clickable label="出发地" placeholder="请出入出发地">
       <template #right-icon>
         <text class="create selectText" @click="item.showCascader = true">
           选择出发地
@@ -359,19 +313,11 @@ watch(() => state.invoiceForm, () => {
     </van-field>
     <van-popup v-model:show="item.showCascader" round position="bottom">
       <van-cascader
-        v-model="item.cascaderValue"
-        title="请选择所在地区"
-        :options="item.areaList"
-        @close="item.showCascader = false"
-        @finish="(event) => onFinish(event, item, 1)"
+        v-model="item.cascaderValue" title="请选择所在地区" :options="item.areaList"
+        @close="item.showCascader = false" @finish="(event) => onFinish(event, item, 1)"
       />
     </van-popup>
-    <van-field
-      v-model="item.tripPeopleForm.travelDestinationPlace"
-      clickable
-      label="目的地"
-      placeholder="请输入目的地"
-    >
+    <van-field v-model="item.tripPeopleForm.travelDestinationPlace" clickable label="目的地" placeholder="请输入目的地">
       <template #right-icon>
         <text class="create selectText" @click="item.showCascaderTwo = true">
           选择目的地
@@ -380,19 +326,12 @@ watch(() => state.invoiceForm, () => {
     </van-field>
     <van-popup v-model:show="item.showCascaderTwo" round position="bottom">
       <van-cascader
-        v-model="item.cascaderTwoValue"
-        title="请选择所在地区"
-        :options="item.areaListTwo"
-        @close="item.showCascaderTwo = false"
-        @finish="(event) => onFinish(event, item, 2)"
+        v-model="item.cascaderTwoValue" title="请选择所在地区" :options="item.areaListTwo"
+        @close="item.showCascaderTwo = false" @finish="(event) => onFinish(event, item, 2)"
       />
     </van-popup>
     <van-field
-      v-model="item.pickerValueTwo"
-      clickable
-      readonly
-      label="交通工具"
-      placeholder="请选择交通工具"
+      v-model="item.pickerValueTwo" clickable readonly label="交通工具" placeholder="请选择交通工具"
       @click="item.showVehicle = true"
     >
       <template #right-icon>
@@ -401,19 +340,13 @@ watch(() => state.invoiceForm, () => {
     </van-field>
     <van-popup v-model:show="item.showVehicle" round position="bottom">
       <van-picker
-        v-model="item.vehicleTypeList"
-        :columns="vehicleTypes"
-        @cancel="item.showVehicle = false"
+        v-model="item.vehicleTypeList" :columns="vehicleTypes" @cancel="item.showVehicle = false"
         @confirm="onConfirm($event, 2, item)"
       />
     </van-popup>
     <van-field
-      v-model="item.tripPeopleForm.level"
-      :readonly="ifShowSelect(item)"
-      clickable
-      label="等级"
-      :placeholder="ifShowSelect(item) ? '请选择等级' : '请填写等级'"
-      @click="ifShowSelectLevel(item)"
+      v-model="item.tripPeopleForm.level" :readonly="ifShowSelect(item)" clickable label="等级"
+      :placeholder="ifShowSelect(item) ? '请选择等级' : '请填写等级'" @click="ifShowSelectLevel(item)"
     >
       <template #right-icon>
         <van-icon v-if="ifShowSelect(item)" name="arrow" />
@@ -421,31 +354,29 @@ watch(() => state.invoiceForm, () => {
     </van-field>
     <van-popup v-model:show="item.showLevel" round position="bottom">
       <van-picker
-        v-if="item.tripPeopleForm.vehicleType === 1"
-        :columns="planeLevels"
-        @cancel="item.showLevel = false"
+        v-if="item.tripPeopleForm.vehicleType === 1" :columns="planeLevels" @cancel="item.showLevel = false"
         @confirm="onConfirm($event, 3, item)"
       />
       <van-picker
-        v-if="item.tripPeopleForm.vehicleType === 2"
-        :columns="trainLevels"
-        @cancel="item.showLevel = false"
+        v-if="item.tripPeopleForm.vehicleType === 2" :columns="trainLevels" @cancel="item.showLevel = false"
         @confirm="onConfirm($event, 3, item)"
       />
       <van-picker
-        v-if="item.tripPeopleForm.vehicleType === 7"
-        :columns="shippingLevels"
-        @cancel="item.showLevel = false"
-        @confirm="onConfirm($event, 3, item)"
+        v-if="item.tripPeopleForm.vehicleType === 7" :columns="shippingLevels"
+        @cancel="item.showLevel = false" @confirm="onConfirm($event, 3, item)"
       />
     </van-popup>
-    <div class="tripButton create" @click="addTripPeople">
-      添加出行人
-    </div>
     <div class="tripButton delete" @click="deleteTripPeople(index)">
       删除出行人
     </div>
   </van-cell-group>
+  <div class="tripBottom">
+    <van-button color="#f5f5f5" plain style="width: 100%" type="primary" @click="addTripPeople">
+      <div style="color: #1989fa">
+        添加出行人
+      </div>
+    </van-button>
+  </div>
 </template>
 
 <style scoped lang="less">
@@ -456,16 +387,19 @@ watch(() => state.invoiceForm, () => {
   padding: 15px 0;
 }
 
-.create{
+.create {
   color: #1989fa;
 }
 
-.delete{
-  margin-top: -15px;
+.delete {
   color: #ee0a24;
 }
 
 .selectText {
   font-size: 2.8vw;
+}
+
+.tripBottom {
+  padding: 10px 16px;
 }
 </style>

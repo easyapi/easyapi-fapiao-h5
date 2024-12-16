@@ -120,6 +120,7 @@ function deleteIdTypeAndVehicle() {
 onMounted(() => {
   document.title = '出行人管理'
   getTravelers()
+  localStorage.setItem('ifUseTripPeopleInfo', true)
 })
 </script>
 

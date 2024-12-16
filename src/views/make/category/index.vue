@@ -153,7 +153,7 @@ function makeInvoice() {
 
   if (!checkEmailMobile(state.invoiceForm))
     return
-  if (state.invoiceForm.specificBusinessCode === '09') {
+  if (state.invoiceForm.specificBusinessCode === '09' && state.tripData) {
     state.tripData.forEach((item) => {
       state.invoiceForm.specificBusiness.push(item)
     })
