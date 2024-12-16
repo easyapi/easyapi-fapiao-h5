@@ -49,8 +49,8 @@ const state = reactive({
     extends: [],
     customCategoryId: null,
     companyId: null,
-    // specificBusiness: [],
-    // specificBusinessCode: '',
+    specificBusiness: [],
+    specificBusinessCode: '',
   },
   init: false,
   tripData: null,
@@ -112,13 +112,21 @@ function getCustomCategoryList() {
   customCategory.getCustomCategoryList(params).then((res) => {
     if (res.code === 1) {
       state.customCategoryList = res.content
+      if (localStorage.get('customCategory')) {
+        const customCategory = localStorage.get('customCategory')
+        state.customCategory = {
+          customCategoryId: customCategory.customCategoryId,
+          name: customCategory.name,
+        }
+        state.invoiceForm.specificBusinessCode = customCategory.specificBusinessCode
+      }
       state.customCategoryList.forEach((item) => {
-        // state.invoiceForm.specificBusinessCode = item.specificBusinessCode
         item.text = item.name
         item.value = item.customCategoryId
-        if (item.ifDefault) {
+        if (!localStorage.get('customCategory') && item.ifDefault) {
           state.customCategory.customCategoryId = item.customCategoryId
           state.customCategory.name = item.name
+          state.invoiceForm.specificBusinessCode = item.specificBusinessCode
         }
       })
     }
@@ -145,11 +153,11 @@ function makeInvoice() {
 
   if (!checkEmailMobile(state.invoiceForm))
     return
-  // if (state.invoiceForm.specificBusinessCode === '09') {
-  //   state.tripData.forEach((item) => {
-  //     state.invoiceForm.specificBusiness.push(item)
-  //   })
-  // }
+  if (state.invoiceForm.specificBusinessCode === '09') {
+    state.tripData.forEach((item) => {
+      state.invoiceForm.specificBusiness.push(item)
+    })
+  }
   showConfirmDialog({
     title: '提示',
     message: '确认抬头和金额正确并申请开票吗？',
@@ -194,6 +202,8 @@ function onConfirm(value) {
   state.customCategory.customCategoryId = value.selectedOptions[0].customCategoryId
   state.customCategory.name = value.selectedOptions[0].name
   state.showCustomCategory = false
+  state.invoiceForm.specificBusinessCode = value.selectedOptions[0].specificBusinessCode
+  localStorage.set('customCategory', value.selectedOptions[0])
 }
 
 function getTripPeople(data) {
@@ -284,7 +294,7 @@ onMounted(async () => {
         />
       </van-cell>
     </van-cell-group>
-    <!-- <TripPeople v-if="state.invoiceForm.specificBusinessCode === '09'" @get-trip-people="getTripPeople" /> -->
+    <TripPeople v-if="state.invoiceForm.specificBusinessCode === '09'" @get-trip-people="getTripPeople" />
     <Receive
       v-if="state.init"
       :invoice-form="state.invoiceForm"

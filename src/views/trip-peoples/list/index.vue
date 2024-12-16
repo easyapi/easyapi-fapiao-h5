@@ -47,7 +47,6 @@ function getTravelers() {
       state.tripPeoplesList = []
       state.pagination.totalPages = 0
       deleteIdTypeAndVehicle()
-      showToast(res.message)
     }
   })
 }
@@ -65,58 +64,26 @@ function tripPeopleNameSearch() {
 }
 
 /**
- * 选择出行人单选框并且赋值
+ * 选择出行人
  * @param item
  */
 function select(item) {
   state.tripPeoplesData = item
   state.checked = item.travelerId
-  return item
+  const index = route.query.selectId
+  const tripPeoplesData = JSON.parse(localStorage.getItem('tripPeopleData'))
+  tripPeoplesData[index] = state.tripPeoplesData
+  localStorage.setItem('tripPeopleData', JSON.stringify(tripPeoplesData))
+  history.back()
 }
 
-/**
- * 选择出行人
- */
-function selectTripPeople() {
-  if (state.tripPeoplesList.length === 0) {
-    showToast('您还未添加出行人,请先添加出行人')
-    history.back()
-    return
-  }
-  if (!state.tripPeoplesData.travelerId) {
-    showToast('您还未选择出行人')
-    return
-  }
-  showConfirmDialog({
-    title: '提示',
-    message: '确定选择吗？',
-  })
-    .then(() => {
-      const index = route.query.selectId
-      const tripPeoplesData = JSON.parse(localStorage.getItem('tripPeopleData'))
-      tripPeoplesData[index] = state.tripPeoplesData
-      localStorage.setItem('tripPeopleData', JSON.stringify(tripPeoplesData))
-      showToast('选择成功')
-      history.back()
-    })
-}
-
-function deleteTripPeople() {
-  if (state.tripPeoplesList.length === 0) {
-    showToast('您还未添加出行人,请先添加出行人')
-    history.back()
-    return
-  }
-  if (!state.tripPeoplesData.travelerId) {
-    showToast('您还未选择出行人')
-    return
-  }
+function deleteTripPeople(item) {
   showConfirmDialog({
     title: '提示',
     message: '确定删除出行人吗？',
   })
     .then(() => {
-      travelers.deleteTravelers(state.tripPeoplesData.travelerId).then((res) => {
+      travelers.deleteTravelers(item.travelerId).then((res) => {
         state.loading = false
         closeToast()
         if (res.code === 1) {
@@ -135,7 +102,7 @@ function deleteTripPeople() {
  */
 function showIdTypeAndVehicle() {
   state.tripPeoplesList.forEach((item) => {
-    const idType = idTypes.find(type => type.value == item?.idType)
+    const idType = idTypes.find(type => type.value === item?.idType)
     const vehicleType = vehicleTypes.find(type => type.value === item?.vehicleType)
 
     item.pickerValueOne = idType ? idType.text : ''
@@ -179,37 +146,30 @@ onMounted(() => {
             class="company-list-item"
             @click="select(item)"
           >
-            <div class="company-list-item_content">
-              <van-radio
-                class="company-list-item_radio"
-                :name="item.travelerId"
-              />
-              <div class="company-list-item_name">
-                <div class="company-list-item_tag">
-                  <van-tag v-if="item.ifDefault" type="primary" size="medium" class="tag">
-                    默认
-                  </van-tag>
-                  <span class="rise-text">{{ item.traveler }}</span>
+            <van-radio
+              class="company-list-item_radio"
+              :name="item.travelerId"
+            />
+            <div style="flex: 1">
+              <van-swipe-cell>
+                <div class="company-list-item_name">
+                  <div class="company-list-item_tag">
+                    <span class="rise-text">{{ item.traveler }}</span>
+                  </div>
+                  <div class="company-list-item_taxNumber">
+                    {{ item.pickerValueOne }} {{ item.idNumber }}
+                  </div>
+                  <div class="company-list-item_taxNumber">
+                    {{ item.travelDeparturePlace }} - {{ item.travelDestinationPlace }}
+                  </div>
+                  <div class="company-list-item_taxNumber">
+                    {{ item.pickerValueTwo }} / {{ item.level }}
+                  </div>
                 </div>
-                <div class="company-list-item_taxNumber">
-                  证件类型：{{ item.pickerValueOne }}
-                </div>
-                <div class="company-list-item_taxNumber">
-                  证件号码：{{ item.idNumber }}
-                </div>
-                <div class="company-list-item_taxNumber">
-                  出发地：{{ item.travelDeparturePlace }}
-                </div>
-                <div class="company-list-item_taxNumber">
-                  目的地：{{ item.travelDestinationPlace }}
-                </div>
-                <div class="company-list-item_taxNumber">
-                  交通工具类型：{{ item.pickerValueTwo }}
-                </div>
-                <div class="company-list-item_taxNumber">
-                  等级：{{ item.level }}
-                </div>
-              </div>
+                <template #right>
+                  <van-button square text="删除" type="danger" class="delete-button" @click="deleteTripPeople(item)" />
+                </template>
+              </van-swipe-cell>
             </div>
           </div>
         </van-radio-group>
@@ -220,18 +180,6 @@ onMounted(() => {
     </div>
     <div v-if="state.noMoreData" class="no-more-data">
       <div>没有更多数据了</div>
-    </div>
-  </div>
-  <div class="bottom fixed-bottom-bgColor">
-    <div>
-      <van-button type="primary" block @click="selectTripPeople">
-        选择出行人
-      </van-button>
-    </div>
-    <div>
-      <van-button type="danger" block @click="deleteTripPeople">
-        删除出行人
-      </van-button>
     </div>
   </div>
 </template>
@@ -277,7 +225,6 @@ onMounted(() => {
 
   .company-list {
     padding: 0 16px;
-
     .company-list-item {
       border-radius: 5px;
       box-shadow: 0 2px 15px 0 rgba(0, 0, 0, 0.11);
@@ -286,18 +233,14 @@ onMounted(() => {
       background: #fff;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 15px 10px;
-
-      .company-list-item_content {
-        display: flex;
-        align-items: center;
 
         .company-list-item_radio {
+          padding-left: 10px;
           margin-right: 20px;
         }
 
         .company-list-item_name {
+          padding: 15px 10px;
           .company-list-item_tag {
             display: flex;
             align-items: center;
@@ -320,25 +263,10 @@ onMounted(() => {
           .company-list-item_taxNumber {
             margin-top: 10px;
             color: #999;
-            font-size: 13px;
+            font-size: 12px;
           }
         }
       }
-    }
-  }
-}
-
-.bottom {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  padding: 10px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
-  div {
-    width: 48%;
   }
 }
 
@@ -351,5 +279,14 @@ onMounted(() => {
 .loading {
   text-align: center;
   color: #999;
+}
+
+:deep(.van-swipe-cell__right) {
+  display: flex;
+  align-items: center;
+}
+
+.delete-button {
+  height: 100%;
 }
 </style>

@@ -1,11 +1,12 @@
 <script setup lang='ts'>
-import Clipboard from 'clipboard'
-import { closeToast, showImagePreview, showLoadingToast, showToast } from 'vant'
 import invoice from '@/api/invoice'
 import outOrder from '@/api/out-order'
 import { useStore } from '@/stores'
 import { copyText } from '@/utils/invoice'
 import { getIconByStatements } from '@/utils/invoice-category'
+import Clipboard from 'clipboard'
+import { closeToast, showImagePreview, showLoadingToast, showToast } from 'vant'
+import {idTypes, vehicleTypes} from "@/utils/business";
 
 const store = useStore()
 const route = useRoute()
@@ -86,6 +87,7 @@ function getInvoiceDetail() {
       state.invoiceDetail = res.content
       state.copyInfo = copyText(res.content)
       state.attachList = res.content.invoiceExtends && res.content.invoiceExtends.length > 0 ? res.content.invoiceExtends.filter(item => item.fieldKey === 'attch' && item.fieldValue)[0].fieldValue.split(',') : []
+      showIdTypeAndVehicle()
     }
   })
 }
@@ -130,6 +132,18 @@ function viewImagePreview(imgs: any, index: number) {
   })
 }
 
+/**
+ * 转换证件类型和交通工具
+ */
+function showIdTypeAndVehicle() {
+  state.invoiceDetail.specificBusiness.forEach((item) => {
+    const idType = idTypes.find(type => type.value === Number(item?.idType))
+    const vehicleType = vehicleTypes.find(type => type.value === item?.vehicleType)
+    item.idType = idType ? idType.text : ''
+    item.vehicleType = vehicleType ? vehicleType.text : ''
+  })
+}
+
 onMounted(() => {
   document.title = '发票详情'
   getInvoiceDetail()
@@ -165,6 +179,16 @@ onMounted(() => {
         ￥{{ state.invoiceDetail.price }}
       </van-cell>
       <van-cell :value="state.invoiceDetail.remark" title="备注" />
+    </van-cell-group>
+    <van-cell-group v-for="(item, index) in state.invoiceDetail.specificBusiness" :key="index" :title="`出行人${index + 1}信息`" inset>
+      <van-cell :value="item.traveler" title="出行人" />
+      <van-cell :value="item.travelDate" title="出行日期" />
+      <van-cell :value="item.idType" title="证件类型" />
+      <van-cell :value="item.idNumber" title="证件号码" />
+      <van-cell :value="item.travelDeparturePlace" title="出发地" />
+      <van-cell :value="item.travelDestinationPlace" title="目的地" />
+      <van-cell :value="item.vehicleType" title="交通工具" />
+      <van-cell :value="item.level" title="等级" />
     </van-cell-group>
     <div v-if="state.attachList.length > 0" class="card">
       <div class="title">

@@ -27,6 +27,19 @@ const travelers = {
     })
   },
 
+  /**
+   * 获取默认参数信息
+   */
+  findFieldKeyList(params: any): Promise<ApiResponse> {
+    params.size = 100
+    return request.get(`/setting/find`, {
+      params: {
+        accessToken: localStorage.get('accessToken'),
+        ...params,
+      },
+    })
+  },
+
 }
 
 export default travelers
