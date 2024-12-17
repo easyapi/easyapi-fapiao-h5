@@ -51,7 +51,7 @@ const state = reactive({
     customCategoryId: null,
     companyId: null,
     specificBusiness: [],
-    specificBusinessCode: '',
+    specificBusinessCode: null,
   },
   init: false,
   tripData: null,
@@ -113,18 +113,10 @@ function getCustomCategoryList() {
   customCategory.getCustomCategoryList(params).then((res) => {
     if (res.code === 1) {
       state.customCategoryList = res.content
-      if (localStorage.get('customCategory')) {
-        const customCategory = localStorage.get('customCategory')
-        state.customCategory = {
-          customCategoryId: customCategory.customCategoryId,
-          name: customCategory.name,
-        }
-        state.invoiceForm.specificBusinessCode = customCategory.specificBusinessCode
-      }
       state.customCategoryList.forEach((item) => {
         item.text = item.name
         item.value = item.customCategoryId
-        if (!localStorage.get('customCategory') && item.ifDefault) {
+        if (item.ifDefault) {
           state.customCategory.customCategoryId = item.customCategoryId
           state.customCategory.name = item.name
           state.invoiceForm.specificBusinessCode = item.specificBusinessCode
@@ -205,12 +197,10 @@ function onConfirm(value) {
   state.customCategory.name = value.selectedOptions[0].name
   state.showCustomCategory = false
   state.invoiceForm.specificBusinessCode = value.selectedOptions[0].specificBusinessCode
-  localStorage.set('customCategory', value.selectedOptions[0])
 }
 
 function getTripPeople(data) {
   state.tripData = data
-  localStorage.set('tripPeopleData', state.tripData)
 }
 
 onMounted(async () => {

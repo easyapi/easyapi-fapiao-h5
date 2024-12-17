@@ -11,6 +11,7 @@ declare module 'vue' {
     Invoice: typeof import('./src/components/make/Invoice.vue')['default']
     Receive: typeof import('./src/components/make/Receive.vue')['default']
     TripPeople: typeof import('./src/components/make/TripPeople.vue')['default']
+    TripPeoplesList: typeof import('./src/components/make/TripPeoplesList.vue')['default']
     VanActionBar: typeof import('vant/es')['ActionBar']
     VanActionBarButton: typeof import('vant/es')['ActionBarButton']
     VanArea: typeof import('vant/es')['Area']

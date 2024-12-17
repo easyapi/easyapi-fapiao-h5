@@ -11,8 +11,7 @@ const state = reactive({
   tripData: [],
   invoiceForm: [] as any,
 })
-
-const router = useRouter()
+const tripPeoplesRef = ref(null)
 
 function onConfirm(event, index, item) {
   const { selectedOptions, selectedValues } = event
@@ -79,10 +78,10 @@ function areaListData(data) {
 }
 
 /**
- * 前往抬头管理页
+ * 打开出行人弹出框选择出行人
  */
-function gotoTripPeoples(id: any) {
-  router.push({ path: '/trip-peoples/list', query: { selectId: id } })
+function selectTripPeople(index: number) {
+  tripPeoplesRef.value.showDialog(index)
 }
 
 /**
@@ -102,13 +101,15 @@ function ifShowSelect(item) {
  */
 function addTripPeople() {
   state.invoiceForm.push({
-    tripPeopleForm: {},
+    tripPeopleForm: {
+      idType: 201,
+    },
     travelDateFormatter: [now.getFullYear(), now.getMonth() + 1, now.getDate()],
   })
   findFieldKeyList()
   getAreaList()
   getDefaultDate()
-  getTripPeopleForm()
+  getData()
 }
 
 function deleteTripPeople(index) {
@@ -118,7 +119,7 @@ function deleteTripPeople(index) {
   })
     .then(() => {
       state.invoiceForm.splice(index, 1)
-      getTripPeopleForm()
+      getData()
       showToast('删除成功')
     })
 }
@@ -159,17 +160,6 @@ function tipInfo(value) {
   if (value.length === 20) {
     showToast('证件号码最多输入20位')
   }
-}
-
-/**
- * 遍历invoiceForm获取tripPeopleForm
- */
-function getTripPeopleForm() {
-  const tripPeopleFormList = []
-  state.invoiceForm.forEach((item) => {
-    tripPeopleFormList.push(item.tripPeopleForm)
-  })
-  localStorage.setItem('tripPeopleData', JSON.stringify(tripPeopleFormList))
 }
 
 /**
@@ -228,46 +218,34 @@ function ifShowSelectLevel(item) {
   }
 }
 
-onMounted(() => {
-  if (localStorage.getItem('ifUseTripPeopleInfo')) {
-    if (localStorage.getItem('tripPeopleData')) {
-      state.tripData = JSON.parse(localStorage.getItem('tripPeopleData'))
-      state.tripData.forEach((item, index) => {
-        if (!state.invoiceForm[index]) {
-          state.invoiceForm.push({ tripPeopleForm: {}, travelDateFormatter: [now.getFullYear(), now.getMonth() + 1, now.getDate()] })
-          state.invoiceForm[index].tripPeopleForm = item
-        }
-        else {
-          state.invoiceForm[index].tripPeopleForm = item
-        }
-      })
-    }
-    findFieldKeyList()
-    getAreaList()
-    showIdTypeAndVehicle()
-    getDefaultDate()
-    getTripPeopleForm()
-  }
-})
-
-onUnmounted(() => {
-  localStorage.removeItem('ifUseTripPeopleInfo')
-})
+function setTripPeopleData(tripPeopleData: any, index: number) {
+  state.invoiceForm[index].tripPeopleForm = tripPeopleData
+  showIdTypeAndVehicle()
+  getDefaultDate()
+  tripPeoplesRef.value.closeDialog()
+  getData()
+}
 
 /**
- * 监控变化一旦变化更改数据
+ * 返回数据给父组件
  */
-watch(() => state.invoiceForm, () => {
-  getTripPeopleForm()
-  emit('getTripPeople', JSON.parse(localStorage.getItem('tripPeopleData')))
-}, { deep: true })
+function getData() {
+  state.tripData = []
+  state.invoiceForm.forEach((item) => {
+    state.tripData.push(item.tripPeopleForm)
+  })
+  emit('getTripPeople', state.tripData)
+}
+
+onMounted(() => {
+})
 </script>
 
 <template>
   <van-cell-group v-for="(item, index) in state.invoiceForm" :key="index" :title="`出行人${index + 1}信息`" inset>
     <van-field v-model="item.tripPeopleForm.traveler" required clickable label="出行人" placeholder="请输入出行人">
       <template #right-icon>
-        <text class="create selectText" @click="gotoTripPeoples(index)">
+        <text class="create selectText" @click="selectTripPeople(index)">
           选择出行人
         </text>
       </template>
@@ -381,6 +359,7 @@ watch(() => state.invoiceForm, () => {
       </div>
     </van-button>
   </div>
+  <tripPeoplesList ref="tripPeoplesRef" @select-trip-people-data="setTripPeopleData" />
 </template>
 
 <style scoped lang="less">
