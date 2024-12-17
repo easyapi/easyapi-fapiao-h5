@@ -265,7 +265,7 @@ watch(() => state.invoiceForm, () => {
 
 <template>
   <van-cell-group v-for="(item, index) in state.invoiceForm" :key="index" :title="`出行人${index + 1}信息`" inset>
-    <van-field v-model="item.tripPeopleForm.traveler" clickable label="出行人" placeholder="请输入出行人">
+    <van-field v-model="item.tripPeopleForm.traveler" required clickable label="出行人" placeholder="请输入出行人">
       <template #right-icon>
         <text class="create selectText" @click="gotoTripPeoples(index)">
           选择出行人
@@ -287,7 +287,8 @@ watch(() => state.invoiceForm, () => {
       />
     </van-popup>
     <van-field
-      v-model="item.pickerValueOne" clickable label="证件类型" readonly placeholder="请选择证件类型"
+      v-model="item.pickerValueOne"
+      required clickable label="证件类型" readonly placeholder="请选择证件类型"
       @click="item.showPopup = true"
     >
       <template #right-icon>
@@ -301,10 +302,11 @@ watch(() => state.invoiceForm, () => {
       />
     </van-popup>
     <van-field
-      v-model="item.tripPeopleForm.idNumber" clickable label="证件号码" placeholder="请填写证件号码" maxlength="20"
+      v-model="item.tripPeopleForm.idNumber"
+      required clickable label="证件号码" placeholder="请填写证件号码" maxlength="20"
       @update:model-value="tipInfo"
     />
-    <van-field v-model="item.tripPeopleForm.travelDeparturePlace" clickable label="出发地" placeholder="请出入出发地">
+    <van-field v-model="item.tripPeopleForm.travelDeparturePlace" required clickable label="出发地" placeholder="请输入出发地">
       <template #right-icon>
         <text class="create selectText" @click="item.showCascader = true">
           选择出发地
@@ -317,7 +319,7 @@ watch(() => state.invoiceForm, () => {
         @close="item.showCascader = false" @finish="(event) => onFinish(event, item, 1)"
       />
     </van-popup>
-    <van-field v-model="item.tripPeopleForm.travelDestinationPlace" clickable label="目的地" placeholder="请输入目的地">
+    <van-field v-model="item.tripPeopleForm.travelDestinationPlace" required clickable label="目的地" placeholder="请输入目的地">
       <template #right-icon>
         <text class="create selectText" @click="item.showCascaderTwo = true">
           选择目的地
@@ -331,7 +333,8 @@ watch(() => state.invoiceForm, () => {
       />
     </van-popup>
     <van-field
-      v-model="item.pickerValueTwo" clickable readonly label="交通工具" placeholder="请选择交通工具"
+      v-model="item.pickerValueTwo"
+      required clickable readonly label="交通工具" placeholder="请选择交通工具"
       @click="item.showVehicle = true"
     >
       <template #right-icon>
@@ -345,7 +348,8 @@ watch(() => state.invoiceForm, () => {
       />
     </van-popup>
     <van-field
-      v-model="item.tripPeopleForm.level" :readonly="ifShowSelect(item)" clickable label="等级"
+      v-model="item.tripPeopleForm.level"
+      :required="ifShowSelect(item)" :readonly="ifShowSelect(item)" clickable label="等级"
       :placeholder="ifShowSelect(item) ? '请选择等级' : '请填写等级'" @click="ifShowSelectLevel(item)"
     >
       <template #right-icon>

@@ -4,6 +4,7 @@ import make from '@/api/make'
 import qiniu from '@/api/qiniu'
 import { useStore } from '@/stores'
 import { localStorage } from '@/utils/local-storage'
+import { verificationSpecificBusiness } from '@/utils/specific-business'
 import { validPrice } from '@/utils/validate'
 import { closeToast, showConfirmDialog, showLoadingToast, showToast } from 'vant'
 import makeMixins from '../mixins/make'
@@ -112,6 +113,7 @@ function getCustomCategoryList() {
   customCategory.getCustomCategoryList(params).then((res) => {
     if (res.code === 1) {
       state.customCategoryList = res.content
+      state.customCategoryList[0].specificBusinessCode = '09'
       if (localStorage.get('customCategory')) {
         const customCategory = localStorage.get('customCategory')
         state.customCategory = {
@@ -154,9 +156,10 @@ function makeInvoice() {
   if (!checkEmailMobile(state.invoiceForm))
     return
   if (state.invoiceForm.specificBusinessCode === '09' && state.tripData) {
-    state.tripData.forEach((item) => {
-      state.invoiceForm.specificBusiness.push(item)
-    })
+    if (!verificationSpecificBusiness(state.invoiceForm.specificBusinessCode, state.tripData)) {
+      return
+    }
+    state.invoiceForm.specificBusiness = state.tripData
   }
   showConfirmDialog({
     title: '提示',
