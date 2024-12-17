@@ -113,7 +113,6 @@ function getCustomCategoryList() {
   customCategory.getCustomCategoryList(params).then((res) => {
     if (res.code === 1) {
       state.customCategoryList = res.content
-      state.customCategoryList[0].specificBusinessCode = '09'
       if (localStorage.get('customCategory')) {
         const customCategory = localStorage.get('customCategory')
         state.customCategory = {
