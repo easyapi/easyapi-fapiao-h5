@@ -2,10 +2,10 @@
 import area from '@/api/area'
 import travelers from '@/api/travelers'
 import { idTypes, planeLevels, shippingLevels, trainLevels, vehicleTypes } from '@/utils/business'
+import dayjs from 'dayjs'
 import { showConfirmDialog, showToast } from 'vant'
 
 const emit = defineEmits(['getTripPeople'])
-const now = new Date()
 const state = reactive({
   ifDefault: true,
   tripData: [],
@@ -100,11 +100,12 @@ function ifShowSelect(item) {
  * 增加出行人
  */
 function addTripPeople() {
+  const day = dayjs().format('YYYY-MM-DD')
   state.invoiceForm.push({
     tripPeopleForm: {
       idType: 201,
     },
-    travelDateFormatter: [now.getFullYear(), now.getMonth() + 1, now.getDate()],
+    travelDateFormatter: [day.slice(0, 4), day.slice(5, 7), day.slice(8, 10)],
   })
   findFieldKeyList()
   getAreaList()

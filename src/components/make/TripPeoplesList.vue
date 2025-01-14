@@ -44,7 +44,7 @@ function getTravelers() {
     }
     else {
       state.tripPeoplesList = []
-      state.pagination.totalPages = 0
+      // state.pagination.totalPages = 0
       // deleteIdTypeAndVehicle()
     }
   })
