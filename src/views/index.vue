@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { localStorage } from '@/utils/local-storage'
-import setting from '@/api/setting'
 import orderType from '@/api/order-type'
+import setting from '@/api/setting'
+import { localStorage } from '@/utils/local-storage'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,6 +11,7 @@ const state = shallowReactive({
   ifMoneyMake: false, // 是否支持金额开票
   ifOrderMake: false, // 是否支持订单开票
   orderTypeList: [], // 订单开票类型列表
+  remark: '',
 })
 
 /**
@@ -52,7 +53,7 @@ function getOrderTypeList() {
  */
 function findSetting() {
   setting.findSetting({
-    fieldKeys: 'if_product' + ',' + 'if_money' + ',' + 'if_order',
+    fieldKeys: 'if_product' + ',' + 'if_money' + ',' + 'if_order' + ',' + 'h5_index_remark',
   }).then((res) => {
     if (res.code === 1) {
       for (const setting of res.content) {
@@ -67,6 +68,9 @@ function findSetting() {
         else if (setting.fieldKey === 'if_order') {
           state.ifOrderMake = setting.fieldValue === 'true'
           localStorage.set('ifOrderMake', state.ifOrderMake)
+        }
+        else if (setting.fieldKey === 'h5_index_remark') {
+          state.remark = setting.fieldValue
         }
       }
     }
@@ -85,31 +89,20 @@ onMounted(() => {
 <template>
   <div>
     <van-cell-group v-if="state.ifOrderMake === true" title="订单开票" inset>
-      <van-cell
-        v-for="item in state.orderTypeList"
-        :key="item.orderTypeId"
-        :title="item.name"
-        is-link
-        :to="{ path: '/out-order', query: { type: item.name } }"
-        size="large"
-      />
+      <van-cell v-for="item in state.orderTypeList" :key="item.orderTypeId" :title="item.name" is-link
+        :to="{ path: '/out-order', query: { type: item.name } }" size="large" />
     </van-cell-group>
     <van-cell-group title="发票管理" inset>
       <van-cell title="开票记录" is-link to="/invoice/list" />
       <van-cell title="开票规则" is-link to="/rule" />
-      <van-cell
-        title="抬头管理"
-        is-link
-        :to="{ path: '/company/list', query: { from: 'index' } }"
-      />
-      <van-cell
-        title="地址管理"
-        is-link
-        :to="{ path: '/address/list', query: { from: 'index' } }"
-      />
+      <van-cell title="抬头管理" is-link :to="{ path: '/company/list', query: { from: 'index' } }" />
+      <van-cell title="地址管理" is-link :to="{ path: '/address/list', query: { from: 'index' } }" />
     </van-cell-group>
     <div class="remark">
-      如果无法提交开票申请，请联系发票客服13656171020（仅能解决发票无法开具问题）
+      <div>
+        如果无法提交开票申请，请联系发票客服13656171020（仅能解决发票无法开具问题）
+      </div>
+      <div class="remark-content" v-html="state.remark" />
     </div>
     <div v-if="state.ifProductMake || state.ifMoneyMake" class="bottom fixed-bottom-bgColor">
       <van-button type="primary" class="submit" block @click="gotoMake">
@@ -141,5 +134,11 @@ onMounted(() => {
     letter-spacing: 2px;
     text-indent: 2px;
   }
+}
+</style>
+
+<style lang="less">
+.remark-content p {
+  font-size: 12px !important;
 }
 </style>
