@@ -99,10 +99,7 @@ onMounted(() => {
       <van-cell title="地址管理" is-link :to="{ path: '/address/list', query: { from: 'index' } }" />
     </van-cell-group>
     <div class="remark">
-      <div>
-        如果无法提交开票申请，请联系发票客服13656171020（仅能解决发票无法开具问题）
-      </div>
-      <div class="remark-content" v-html="state.remark" />
+      <div v-html="state.remark" />
     </div>
     <div v-if="state.ifProductMake || state.ifMoneyMake" class="bottom fixed-bottom-bgColor">
       <van-button type="primary" class="submit" block @click="gotoMake">
@@ -134,11 +131,5 @@ onMounted(() => {
     letter-spacing: 2px;
     text-indent: 2px;
   }
-}
-</style>
-
-<style lang="less">
-.remark-content p {
-  font-size: 12px !important;
 }
 </style>
