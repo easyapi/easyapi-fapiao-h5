@@ -41,7 +41,7 @@ const make = {
 
   productMakeInvoice(data: any): Promise<any> {
     data.accessToken = localStorage.get('accessToken')
-    return request.post('/invoice/product/make', data)
+    return request.post('/invoice/product-make', data)
   },
 }
 
