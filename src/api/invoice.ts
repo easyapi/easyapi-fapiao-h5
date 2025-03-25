@@ -19,7 +19,7 @@ const invoice = {
   /**
    * 获取发票详情信息
    */
-  getInvoice(id: number): Promise<any> {
+  getInvoice(id: any): Promise<any> {
     return request.get(`/invoice/${id}`, {
       params: {
         accessToken: localStorage.get('accessToken'),

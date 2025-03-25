@@ -37,7 +37,7 @@ const state = reactive({
     electronicInvoiceImg: '',
     electronicInvoiceUrl: '',
     url: '',
-  },
+  } as any,
   copyInfo: '',
   attachList: [],
 })
@@ -173,8 +173,8 @@ onMounted(() => {
     <van-cell-group title="发票详情" inset>
       <van-cell :value="state.invoiceDetail.purchaserName" title="发票抬头" />
       <van-cell :value="state.invoiceDetail.purchaserTaxpayerNumber" title="税号" />
-      <van-cell :value="state.invoiceDetail.purchaserAddress + state.invoiceDetail.purchaserPhone" title="地址、电话" />
-      <van-cell :value="state.invoiceDetail.purchaserBank + state.invoiceDetail.purchaserBankAccount" title="开户行及账号" />
+      <van-cell :value="state.invoiceDetail.purchaserAddress + '&nbsp;&nbsp;'  + state.invoiceDetail.purchaserPhone" title="地址、电话" />
+      <van-cell :value="state.invoiceDetail.purchaserBank + '&nbsp;&nbsp;' + state.invoiceDetail.purchaserBankAccount" title="开户行及账号" />
       <van-cell :value="state.invoiceDetail.price" title="发票金额">
         ￥{{ state.invoiceDetail.price }}
       </van-cell>

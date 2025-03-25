@@ -13,7 +13,7 @@ const state = reactive({
 })
 const tripPeoplesRef = ref(null)
 
-function onConfirm(event, index, item) {
+function onConfirm(event: any, index: any, item: any) {
   const { selectedOptions, selectedValues } = event
   if (index === 1) {
     item.showPopup = false
@@ -33,6 +33,7 @@ function onConfirm(event, index, item) {
   else if (index === 3) {
     item.showLevel = false
     item.tripPeopleForm.level = selectedOptions[0].text
+    item.selectLevel = selectedValues
   }
 }
 
@@ -49,7 +50,7 @@ function getAreaList() {
   })
 }
 
-function onFinish(Event, item, index) {
+function onFinish(Event: any, item: any, index: any) {
   const { selectedOptions } = Event
   if (index === 1) {
     item.showCascader = false
@@ -87,7 +88,7 @@ function selectTripPeople(index: number) {
 /**
  * 是否显示等级选择框
  */
-function ifShowSelect(item) {
+function ifShowSelect(item: any) {
   if (item.tripPeopleForm?.vehicleType === 1 || item.tripPeopleForm?.vehicleType === 2 || item.tripPeopleForm?.vehicleType === 7) {
     return true
   }
@@ -106,6 +107,7 @@ function addTripPeople() {
       idType: 201,
     },
     travelDateFormatter: [day.slice(0, 4), day.slice(5, 7), day.slice(8, 10)],
+    idTypeList: [201],
   })
   findFieldKeyList()
   getAreaList()
@@ -137,7 +139,7 @@ function selectDate(item) {
  * 显示证件类型&交通工具
  */
 function showIdTypeAndVehicle() {
-  state.invoiceForm.forEach((item) => {
+  state.invoiceForm.forEach((item: any) => {
     const idType = idTypes.find(type => type.value === Number(item.tripPeopleForm?.idType))
     const vehicleType = vehicleTypes.find(type => type.value === item.tripPeopleForm?.vehicleType)
     item.pickerValueOne = idType ? idType.text : ''
@@ -149,7 +151,7 @@ function showIdTypeAndVehicle() {
  * 获取默认时间
  */
 function getDefaultDate() {
-  state.invoiceForm.forEach((item) => {
+  state.invoiceForm.forEach((item: any) => {
     item.tripPeopleForm.travelDate = item.travelDateFormatter.join('-')
   })
 }
@@ -174,31 +176,35 @@ function findFieldKeyList() {
     if (res.code === 1) {
       for (const setting of res.content) {
         if (setting.fieldKey === 'default-travel-departure-place') {
-          state.invoiceForm.forEach((item) => {
+          state.invoiceForm.forEach((item: any) => {
             if (!item.tripPeopleForm.travelDeparturePlace) {
               item.tripPeopleForm.travelDeparturePlace = setting.fieldValue
             }
           })
         }
         else if (setting.fieldKey === 'default-travel-destination-place') {
-          state.invoiceForm.forEach((item) => {
+          state.invoiceForm.forEach((item: any) => {
             if (!item.tripPeopleForm.travelDestinationPlace) {
               item.tripPeopleForm.travelDestinationPlace = setting.fieldValue
             }
           })
         }
         else if (setting.fieldKey === 'default-vehicle-type') {
-          state.invoiceForm.forEach((item) => {
+          state.invoiceForm.forEach((item: any) => {
             if (!item.tripPeopleForm.vehicleType) {
               item.tripPeopleForm.vehicleType = Number(setting.fieldValue)
+              item.vehicleTypeList = []
+              item.vehicleTypeList.push(Number(setting.fieldValue))
             }
           })
         }
         else if (setting.fieldKey === 'default-level') {
-          state.invoiceForm.forEach((item) => {
-            if (item.tripPeopleForm.vehicleType === 2) {
+          state.invoiceForm.forEach((item: any) => {
+            // if (item.tripPeopleForm.vehicleType === 2) {
               item.tripPeopleForm.level = setting.fieldValue
-            }
+              item.selectLevel = []
+              item.selectLevel.push(setting.fieldValue)
+            // }
           })
         }
       }
@@ -232,7 +238,7 @@ function setTripPeopleData(tripPeopleData: any, index: number) {
  */
 function getData() {
   state.tripData = []
-  state.invoiceForm.forEach((item) => {
+  state.invoiceForm.forEach((item: any) => {
     state.tripData.push(item.tripPeopleForm)
   })
   emit('getTripPeople', state.tripData)
@@ -337,15 +343,21 @@ onMounted(() => {
     </van-field>
     <van-popup v-model:show="item.showLevel" round position="bottom">
       <van-picker
-        v-if="item.tripPeopleForm.vehicleType === 1" :columns="planeLevels" @cancel="item.showLevel = false"
+        v-if="item.tripPeopleForm.vehicleType === 1"
+        v-model="item.selectLevel"
+        :columns="planeLevels" @cancel="item.showLevel = false"
         @confirm="onConfirm($event, 3, item)"
       />
       <van-picker
-        v-if="item.tripPeopleForm.vehicleType === 2" :columns="trainLevels" @cancel="item.showLevel = false"
+        v-if="item.tripPeopleForm.vehicleType === 2"
+        v-model="item.selectLevel"
+        :columns="trainLevels" @cancel="item.showLevel = false"
         @confirm="onConfirm($event, 3, item)"
       />
       <van-picker
-        v-if="item.tripPeopleForm.vehicleType === 7" :columns="shippingLevels"
+        v-if="item.tripPeopleForm.vehicleType === 7"
+        v-model="item.selectLevel"
+        :columns="shippingLevels"
         @cancel="item.showLevel = false" @confirm="onConfirm($event, 3, item)"
       />
     </van-popup>
