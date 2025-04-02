@@ -1,10 +1,10 @@
+import setting from '@/api/setting'
+import { validEmail, validMobile } from '@/utils/validate'
 /**
  * 开票页Mixin
  */
 import { showToast } from 'vant'
 import { reactive } from 'vue'
-import setting from '@/api/setting'
-import { validEmail, validMobile } from '@/utils/validate'
 
 export default function () {
   const common = reactive({

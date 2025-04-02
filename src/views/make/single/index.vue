@@ -1,10 +1,10 @@
 <script setup lang='ts'>
-import { closeToast, showConfirmDialog, showLoadingToast, showToast } from 'vant'
-import makeMixins from '../mixins/make'
 import make from '@/api/make'
 import outOrder from '@/api/out-order'
-import { localStorage } from '@/utils/local-storage'
 import { useStore } from '@/stores'
+import { localStorage } from '@/utils/local-storage'
+import { closeToast, showConfirmDialog, showLoadingToast, showToast } from 'vant'
+import makeMixins from '../mixins/make'
 
 const { common, getInvoiceRemark, ifNeedMobileEmail, checkEmailMobile } = makeMixins()
 const store = useStore()

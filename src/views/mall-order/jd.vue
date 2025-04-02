@@ -1,7 +1,7 @@
 <script setup lang='ts'>
+import mallOrder from '@/api/mall-order'
 import { showConfirmDialog, showDialog, showToast } from 'vant'
 import makeMixins from '../make/mixins/make'
-import mallOrder from '@/api/mall-order'
 
 const { checkEmailMobile } = makeMixins()
 

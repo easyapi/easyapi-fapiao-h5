@@ -1,11 +1,11 @@
 <script setup lang='ts'>
-import dayjs from 'dayjs'
-import { showToast } from 'vant'
-import Clipboard from 'clipboard'
 import invoice from '@/api/invoice'
 import { useStore } from '@/stores'
-import { getColorByStatements, invoiceTag } from '@/utils/invoice-category'
 import { copyText } from '@/utils/invoice'
+import { getColorByStatements, invoiceTag } from '@/utils/invoice-category'
+import Clipboard from 'clipboard'
+import dayjs from 'dayjs'
+import { showToast } from 'vant'
 
 const store = useStore()
 const router = useRouter()

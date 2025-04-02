@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import outOrder from '@/api/out-order'
 import shop from '@/api/shop'
 import { useStore } from '@/stores'
 import { localStorage } from '@/utils/local-storage'
+import { computed } from 'vue'
 
 const store = useStore()
 const route = useRoute()
@@ -176,9 +176,7 @@ onMounted(() => {
   >
     <div v-if="state.minusOutOrderList.length > 0" style="margin-bottom: 30px">
       <p class="pd-left">
-        有{{ minusOutOrderList.length }}笔欠费金额，欠费金额小计：¥{{
-          minusAmount
-        }}元
+        有{{ minusOutOrderList.length }}笔欠费金额，欠费金额小计：¥{{ minusAmount }}元
       </p>
       <div
         v-for="(item, index) in state.minusOutOrderList"

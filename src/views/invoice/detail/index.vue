@@ -2,11 +2,11 @@
 import invoice from '@/api/invoice'
 import outOrder from '@/api/out-order'
 import { useStore } from '@/stores'
+import { idTypes, vehicleTypes } from '@/utils/business'
 import { copyText } from '@/utils/invoice'
 import { getIconByStatements } from '@/utils/invoice-category'
 import Clipboard from 'clipboard'
 import { closeToast, showImagePreview, showLoadingToast, showToast } from 'vant'
-import {idTypes, vehicleTypes} from "@/utils/business";
 
 const store = useStore()
 const route = useRoute()
@@ -173,8 +173,8 @@ onMounted(() => {
     <van-cell-group title="发票详情" inset>
       <van-cell :value="state.invoiceDetail.purchaserName" title="发票抬头" />
       <van-cell :value="state.invoiceDetail.purchaserTaxpayerNumber" title="税号" />
-      <van-cell :value="state.invoiceDetail.purchaserAddress + '&nbsp;&nbsp;'  + state.invoiceDetail.purchaserPhone" title="地址、电话" />
-      <van-cell :value="state.invoiceDetail.purchaserBank + '&nbsp;&nbsp;' + state.invoiceDetail.purchaserBankAccount" title="开户行及账号" />
+      <van-cell :value="`${state.invoiceDetail.purchaserAddress}  ${state.invoiceDetail.purchaserPhone}`" title="地址、电话" />
+      <van-cell :value="`${state.invoiceDetail.purchaserBank}  ${state.invoiceDetail.purchaserBankAccount}`" title="开户行及账号" />
       <van-cell :value="state.invoiceDetail.price" title="发票金额">
         ￥{{ state.invoiceDetail.price }}
       </van-cell>
@@ -201,7 +201,7 @@ onMounted(() => {
         >
       </div>
     </div>
-    <van-cell-group v-if="state.invoiceDetail.category.indexOf('电子') !== -1" title="接收方式" inset>
+    <van-cell-group v-if="state.invoiceDetail.category.includes('电子')" title="接收方式" inset>
       <van-cell :value="state.invoiceDetail.email" title="电子邮件" />
       <van-cell :value="state.invoiceDetail.mobile" title="手机号码" />
     </van-cell-group>
@@ -219,7 +219,7 @@ onMounted(() => {
       />
       <van-action-bar-button color="#409eff" text="预览发票" @click="viewPicture" />
       <van-action-bar-button
-        v-if="state.invoiceDetail.category.indexOf('电子') !== -1" type="success" text="发送邮箱"
+        v-if="state.invoiceDetail.category.includes('电子')" type="success" text="发送邮箱"
         @click="openShowEmail"
       />
     </van-action-bar>
