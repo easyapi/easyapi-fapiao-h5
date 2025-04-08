@@ -230,8 +230,8 @@ onMounted(() => {
   .searchList {
     position: fixed;
     background-color: #fff;
-    right: 0;
-    left: 0;
+    right: 16px;
+    left: 16px;
     bottom: 0;
     padding: 0 16px;
     z-index: 999;
