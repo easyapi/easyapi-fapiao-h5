@@ -3,6 +3,7 @@ import mallOrder from '@/api/mall-order'
 import kuaishou01 from '@/assets/images/kuaishou-01.png'
 import kuaishou02 from '@/assets/images/kuaishou-02.png'
 import { localStorage } from '@/utils/local-storage'
+import { validEmail } from '@/utils/validate'
 import { closeToast, showConfirmDialog, showImagePreview, showLoadingToast, showToast } from 'vant'
 
 const route = useRoute()
@@ -10,7 +11,7 @@ const route = useRoute()
 const state = reactive({
   taxNumber: '' as any,
   qrCode: '' as any,
-  shopName: '',
+  shopInfo: null as any,
   outOrderNo: '' as any,
   orderDetail: null as any,
   invoiceForm: {
@@ -75,7 +76,7 @@ function findMall() {
   }
   mallOrder.findMall(params).then((res) => {
     if (res.code === 1) {
-      state.shopName = res.content.shopName
+      state.shopInfo = res.content
     }
   })
 }
@@ -93,6 +94,9 @@ function makeInvoice() {
   if (!state.invoiceForm.purchaserName) {
     return showToast(state.invoiceForm.type === '企业' ? '请选择发票抬头' : '请输入发票抬头')
   }
+  if (state.invoiceForm.email && !validEmail(state.invoiceForm.email)) {
+    return showToast('邮箱格式不正确')
+  }
   showConfirmDialog({
     title: '提示',
     message: '确认抬头和金额正确并申请开票吗？',
@@ -107,7 +111,8 @@ function makeInvoice() {
       ...state.invoiceForm,
       mallCode: 'kuaishou',
       taxNumber: state.taxNumber,
-      shopName: state.shopName,
+      shopName: state.shopInfo.shopName,
+      shopCode: state.shopInfo.shopCode,
     }
     delete data.companyId
     mallOrder.createMallOrder(data).then((res) => {
@@ -145,7 +150,7 @@ function receiveCategory(val: any) {
 }
 
 onMounted(() => {
-  document.title = '快手店铺 - 订单开票'
+  document.title = '快手小店 - 订单开票'
   if (route.query.taxNumber && route.query.code) {
     state.taxNumber = route.query.taxNumber
     state.qrCode = route.query.code
@@ -164,7 +169,7 @@ onMounted(() => {
       <img src="https://qiniu.easyapi.com/mall/kuaishou.png">
     </div>
     <div class="mall-order_title">
-      {{ state.shopName }}快手店铺——订单开票
+      {{ state.shopInfo?.shopName }} 快手小店订单开票
     </div>
     <van-cell-group title="订单信息" inset>
       <van-field
@@ -172,7 +177,8 @@ onMounted(() => {
         label="快手小店订单号"
         placeholder="请输入快手小店订单号"
         required
-        @blur="getOrderDetail"
+        right-icon="search"
+        @click-right-icon="getOrderDetail"
       />
       <van-field
         v-if="state.orderDetail && state.orderDetail.price"
@@ -183,7 +189,7 @@ onMounted(() => {
       />
     </van-cell-group>
     <div class="tips-forget" @click="openTips">
-      我不知道快手订单在哪里
+      我不知道快手小店订单号在哪里
     </div>
     <div v-if="state.orderDetail">
       <Invoice
