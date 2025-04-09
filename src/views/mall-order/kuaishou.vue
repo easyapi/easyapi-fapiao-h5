@@ -212,9 +212,9 @@ function copyLink() {
 
 onMounted(() => {
   document.title = '快手小店 - 订单开票'
-  if (route.query.taxNumber && route.query.code) {
+  if (route.query.taxNumber && route.query.qrCode) {
     state.taxNumber = route.query.taxNumber
-    state.qrCode = route.query.code
+    state.qrCode = route.query.qrCode
     findMall()
   }
   if (sessionStorage.getItem('orderDetail')) {
