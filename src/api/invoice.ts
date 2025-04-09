@@ -65,6 +65,17 @@ const invoice = {
       },
     })
   },
+
+  /**
+   * 根据商户订单号查询发票列表
+   */
+  getInvoiceListByOutOrderNo(outOrderNo: any): Promise<any> {
+    return request.get(`/invoices/${outOrderNo}/query`, {
+      params: {
+        accessToken: localStorage.get('accessToken')
+      }
+    })
+  },
 }
 
 export default invoice

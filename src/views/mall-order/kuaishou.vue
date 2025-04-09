@@ -1,12 +1,17 @@
 <script setup lang='ts'>
+import invoice from '@/api/invoice'
 import mallOrder from '@/api/mall-order'
 import kuaishou01 from '@/assets/images/kuaishou-01.png'
 import kuaishou02 from '@/assets/images/kuaishou-02.png'
+import { copyText } from '@/utils/invoice'
+import { getColorByStatements, invoiceTag } from '@/utils/invoice-category'
 import { localStorage } from '@/utils/local-storage'
 import { validEmail } from '@/utils/validate'
+import Clipboard from 'clipboard'
 import { closeToast, showConfirmDialog, showImagePreview, showLoadingToast, showToast } from 'vant'
 
 const route = useRoute()
+const router = useRouter()
 
 const state = reactive({
   taxNumber: '' as any,
@@ -25,7 +30,10 @@ const state = reactive({
     purchaserBankAccount: '',
     email: '',
   },
-  showTip: false,
+  showTipDialog: false,
+  showInvoiceListDialog: false,
+  invoiceList: [],
+  ifCopy: false,
 })
 
 /**
@@ -34,6 +42,9 @@ const state = reactive({
 function getOrderDetail() {
   if (!state.outOrderNo) {
     return
+  }
+  if (state.outOrderNo.length !== 16) {
+    return showToast('快手小店订单号为16位，请仔细检查')
   }
   if (state.orderDetail && state.outOrderNo === state.orderDetail.outOrderNo) {
     return
@@ -82,9 +93,27 @@ function findMall() {
 }
 
 /**
+ * 根据订单号获取发票列表
+ */
+function getInvoiceListByOutOrderNo() {
+  return new Promise((resolve) => {
+    invoice.getInvoiceListByOutOrderNo(state.outOrderNo).then((res) => {
+      if (res.code === 1) {
+        state.invoiceList = res.content
+        resolve(true)
+      }
+      else {
+        state.invoiceList = []
+        resolve(false)
+      }
+    })
+  })
+}
+
+/**
  * 点击开票
  */
-function makeInvoice() {
+async function makeInvoice() {
   if (!state.outOrderNo) {
     return showToast('请输入快手小店订单号')
   }
@@ -94,8 +123,16 @@ function makeInvoice() {
   if (!state.invoiceForm.purchaserName) {
     return showToast(state.invoiceForm.type === '企业' ? '请选择发票抬头' : '请输入发票抬头')
   }
-  if (state.invoiceForm.email && !validEmail(state.invoiceForm.email)) {
+  if (!state.invoiceForm.email) {
+    return showToast('请输入接收邮箱')
+  }
+  if (!validEmail(state.invoiceForm.email)) {
     return showToast('邮箱格式不正确')
+  }
+  // 根据订单号获取发票列表
+  if (await getInvoiceListByOutOrderNo()) {
+    state.showInvoiceListDialog = true
+    return
   }
   showConfirmDialog({
     title: '提示',
@@ -131,7 +168,7 @@ function makeInvoice() {
  * 点击提示
  */
 function openTips() {
-  state.showTip = true
+  state.showTipDialog = true
 }
 
 /**
@@ -147,6 +184,30 @@ function showPreview(index: any) {
 
 function receiveCategory(val: any) {
   state.invoiceForm.category = val
+}
+
+/**
+ * 跳转详情
+ */
+function gotoDetail(id: any) {
+  if (state.ifCopy) {
+    return
+  }
+  router.push({ path: '/invoice/detail', query: { id } })
+  sessionStorage.removeItem('orderDetail')
+}
+
+function copyLink() {
+  state.ifCopy = true
+  const newClipboard = new Clipboard('.copyBtn')
+  newClipboard.on('success', () => {
+    showToast('复制成功')
+    state.ifCopy = false
+  })
+  newClipboard.on('error', () => {
+    showToast('复制失败')
+    state.ifCopy = false
+  })
 }
 
 onMounted(() => {
@@ -203,6 +264,7 @@ onMounted(() => {
           v-model="state.invoiceForm.email"
           label="邮箱"
           placeholder="请输入接收邮箱"
+          required
         />
       </van-cell-group>
     </div>
@@ -211,7 +273,7 @@ onMounted(() => {
         开票
       </van-button>
     </div>
-    <van-dialog v-model:show="state.showTip" title="温馨提示">
+    <van-dialog v-model:show="state.showTipDialog" title="温馨提示" close-on-click-overlay>
       <div class="img-tip">
         <div>
           <div class="tip-text">
@@ -227,9 +289,86 @@ onMounted(() => {
         </div>
       </div>
     </van-dialog>
+    <van-dialog v-model:show="state.showInvoiceListDialog" title="开票记录" close-on-click-overlay>
+      <div class="record-list">
+        <div
+          v-for="(item, index) in state.invoiceList"
+          :key="index"
+          class="record-list_item"
+          @click="gotoDetail(item.invoiceId)"
+        >
+          <div class="record-list_item_top">
+            <div>
+              <span class="price">￥{{ item.price }}</span>
+              <van-tag :color="invoiceTag(item.category).color">
+                {{ invoiceTag(item.category).name }}
+              </van-tag>
+            </div>
+            <span :style="`color:${getColorByStatements(item.statements)}`" class="status">{{ item.statements }}</span>
+          </div>
+          <div class="record-list_item_bottom">
+            <p class="text">
+              <span>{{ item.purchaserName }}</span>
+            </p>
+            <p class="record-list_item_bottom_time">
+              <span>{{ item.addTime }}</span>
+              <van-button v-if="item.state === 1" class="copyBtn" size="mini" type="primary" data-clipboard-action="copy" :data-clipboard-text="copyText(item)" @click="copyLink">
+                复制发票信息
+              </van-button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </van-dialog>
   </div>
 </template>
 
 <style lang='less'>
 @import './mall-order.less';
+</style>
+
+<style lang='less' scoped>
+.record-list {
+  padding: 0 10px 10px;
+
+  .record-list_item {
+    background: url('@/assets/images/record-bg.png') no-repeat center;
+    background-size: 100% 100%;
+    padding: 10px;
+    margin-top: 10px;
+
+    .record-list_item_top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .status {
+        color: #1989fa;
+      }
+
+      .price {
+        color: #ff4848;
+        margin-right: 10px;
+      }
+    }
+
+    .record-list_item_bottom {
+      margin-top: 30px;
+
+      .text {
+        color: #333;
+        font-size: 14px;
+      }
+
+      .record-list_item_bottom_time {
+        margin-top: 10px;
+        color: #666;
+        font-size: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+  }
+}
 </style>
