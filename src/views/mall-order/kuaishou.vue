@@ -1,25 +1,19 @@
 <script setup lang='ts'>
-import { showConfirmDialog, showToast } from 'vant'
-import makeMixins from '../make/mixins/make'
+import mallOrder from '@/api/mall-order'
 import kuaishou01 from '@/assets/images/kuaishou-01.png'
 import kuaishou02 from '@/assets/images/kuaishou-02.png'
-import { showImagePreview } from 'vant';
+import { localStorage } from '@/utils/local-storage'
+import { closeToast, showConfirmDialog, showImagePreview, showLoadingToast, showToast } from 'vant'
 
-const { checkEmailMobile } = makeMixins()
+const route = useRoute()
 
 const state = reactive({
-  shopName: '娃哈哈',
-  orderForm: {
-    number: '',
-    price: '',
-    email: '',
-  },
-  keyboardShow: false,
-  company: {
-    companyId: '',
-  },
+  taxNumber: '' as any,
+  qrCode: '' as any,
+  shopName: '',
+  outOrderNo: '' as any,
+  orderDetail: null as any,
   invoiceForm: {
-    outOrderNo: `H5${new Date().getTime()}`,
     type: '企业',
     category: '增值税电子普通发票',
     purchaserName: '',
@@ -28,36 +22,98 @@ const state = reactive({
     purchaserPhone: '',
     purchaserBank: '',
     purchaserBankAccount: '',
-    mobile: '',
     email: '',
-    remark: '',
-    price: 0.0,
-    companyId: '',
-    outOrderIds: '',
   },
   showTip: false,
 })
 
 /**
+ * 获取订单详情
+ */
+function getOrderDetail() {
+  if (!state.outOrderNo) {
+    return
+  }
+  if (state.orderDetail && state.outOrderNo === state.orderDetail.outOrderNo) {
+    return
+  }
+  showLoadingToast({
+    message: '加载中...',
+    forbidClick: true,
+    duration: 0,
+  })
+  let params = {
+    oid: state.outOrderNo,
+    taxNumber: state.taxNumber,
+  }
+  mallOrder.getOrderDetail(params).then((res) => {
+    closeToast()
+    if (res.code === 1) {
+      if (res.content.accessToken) {
+        localStorage.set('accessToken', res.content.accessToken)
+        sessionStorage.setItem('orderDetail', JSON.stringify(res.content))
+      }
+      state.orderDetail = res.content
+    }
+    else {
+      state.orderDetail = null
+      sessionStorage.removeItem('orderDetail')
+    }
+  }).catch(() => {
+    state.orderDetail = null
+    sessionStorage.removeItem('orderDetail')
+  })
+}
+
+/**
+ * 查找单条电商平台信息
+ */
+function findMall() {
+  let params = {
+    taxNumber: state.taxNumber,
+    qrCode: state.qrCode,
+  }
+  mallOrder.findMall(params).then((res) => {
+    if (res.code === 1) {
+      state.shopName = res.content.shopName
+    }
+  })
+}
+
+/**
  * 点击开票
  */
 function makeInvoice() {
-  if (state.orderForm.number === '') {
+  if (!state.outOrderNo) {
     showToast('请输入订单号')
     return
   }
-
-  if (state.orderForm.price === '') {
-    showToast('请输入订单金额')
-    return
-  }
-
-  if (!checkEmailMobile(state.orderForm))
-    return
   showConfirmDialog({
     title: '提示',
     message: '确认抬头和金额正确并申请开票吗？',
   }).then(() => {
+    showLoadingToast({
+      message: '开票中...',
+      forbidClick: true,
+      duration: 0,
+    })
+    let data = {
+      ...state.orderDetail,
+      ...state.invoiceForm,
+      mallCode: 'kuaishou',
+      taxNumber: state.taxNumber,
+      shopName: state.shopName,
+    }
+    delete data.companyId
+    mallOrder.createMallOrder(data).then((res) => {
+      closeToast()
+      if (res.code === 1) {
+        showToast(res.message)
+        state.outOrderNo = ''
+        state.orderDetail = null
+        sessionStorage.removeItem('orderDetail')
+      }
+    })
   })
 }
 
@@ -68,22 +124,32 @@ function openTips() {
   state.showTip = true
 }
 
-const showPreview = (index: any) => {
-  // 调用函数式预览
+/**
+ * 图片预览
+ */
+function showPreview(index: any) {
   showImagePreview({
     images: [kuaishou01, kuaishou02],
     startPosition: index,
-    closeable: true
-  });
-};
-
-function receiveCompany(val: any) {
-  state.company = val
+    closeable: true,
+  })
 }
 
-function receiveCategory(val) {
+function receiveCategory(val: any) {
   state.invoiceForm.category = val
 }
+
+onMounted(() => {
+  if (route.query.taxNumber && route.query.code) {
+    state.taxNumber = route.query.taxNumber
+    state.qrCode = route.query.code
+    findMall()
+  }
+  if (sessionStorage.getItem('orderDetail')) {
+    state.orderDetail = JSON.parse(sessionStorage.getItem('orderDetail'))
+    state.outOrderNo = state.orderDetail.outOrderNo
+  }
+})
 </script>
 
 <template>
@@ -91,78 +157,65 @@ function receiveCategory(val) {
     <div class="image">
       <img src="https://qiniu.easyapi.com/mall/kuaishou.png">
     </div>
-    <div class="title">
+    <div class="mall-order_title">
       {{ state.shopName }}快手店铺——订单开票
     </div>
-    <Invoice
-      :is-show="false"
-      :is-hide="false"
-      :invoice-form="state.invoiceForm"
-      :company="state.company"
-      @get-company="receiveCompany"
-      @get-invoice-category="receiveCategory"
-    />
     <van-cell-group title="订单信息" inset>
       <van-field
-        v-model="state.orderForm.number"
-        label="订单号"
+        v-model="state.outOrderNo"
+        label="快手小店订单号"
         placeholder="请输入快手订单号"
         required
+        @blur="getOrderDetail"
       />
       <van-field
-        v-model="state.orderForm.price"
+        v-if="state.orderDetail && state.orderDetail.price"
+        v-model="state.orderDetail.price"
+        label="订单金额"
         readonly
-        clickable
-        label="金额"
-        placeholder="请输入快手订单金额"
-        required
-        @touchstart.stop="state.keyboardShow = true"
-      />
-      <van-number-keyboard
-        v-model="state.orderForm.price"
-        :show="state.keyboardShow"
-        theme="custom"
-        extra-key="."
-        close-button-text="完成"
-        @blur="state.keyboardShow = false"
+        class="price"
       />
     </van-cell-group>
     <div class="tips-forget" @click="openTips">
       我不知道快手订单在哪里
     </div>
-    <van-cell-group title="接收方式" inset>
-      <van-field
-        v-model="state.orderForm.email"
-        label="邮箱"
-        placeholder="请输入接收邮箱"
+    <div v-if="state.orderDetail">
+      <Invoice
+        :is-show="false"
+        :is-hide="false"
+        :invoice-form="state.invoiceForm"
+        @get-invoice-category="receiveCategory"
       />
-    </van-cell-group>
-    <div class="tips">
-      <!-- <p>xxxxxx</p>
-      <p>xxxxxx</p> -->
+      <van-cell-group title="接收方式" inset>
+        <van-field
+          v-model="state.invoiceForm.email"
+          label="邮箱"
+          placeholder="请输入接收邮箱"
+        />
+      </van-cell-group>
     </div>
     <div class="bottom fixed-bottom-bgColor">
       <van-button type="primary" class="submit" block @click="makeInvoice">
         开票
       </van-button>
     </div>
+    <van-dialog v-model:show="state.showTip" title="温馨提示">
+      <div class="img-tip">
+        <div>
+          <div class="tip-text">
+            第1步：找到商家客服，点击底部的订单查询。
+          </div>
+          <img src="@/assets/images/kuaishou-01.png" alt="" class="img-size" @click="showPreview(0)">
+        </div>
+        <div>
+          <div class="tip-text">
+            第2步，点击要开票的订单号后面的复制图标，复制快手订单编号。
+          </div>
+          <img src="@/assets/images/kuaishou-02.png" alt="" class="img-size" @click="showPreview(1)">
+        </div>
+      </div>
+    </van-dialog>
   </div>
-  <van-dialog v-model:show="state.showTip" title="温馨提示">
-    <div class="img-tip">
-      <div>
-        <div class="tip-text">
-          第1步：找到商家客服，点击底部的订单查询。
-        </div>
-        <img src="@/assets/images/kuaishou-01.png" alt="" class="img-size"  @click="showPreview(0)" />
-      </div>
-      <div>
-        <div class="tip-text">
-          第2步，点击要开票的订单号后面的复制图标，复制快手订单编号。
-        </div>
-        <img src="@/assets/images/kuaishou-02.png" alt="" class="img-size"   @click="showPreview(1)" />
-      </div>
-    </div>
-  </van-dialog>
 </template>
 
 <style lang='less'>
