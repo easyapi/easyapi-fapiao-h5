@@ -85,8 +85,13 @@ function findMall() {
  */
 function makeInvoice() {
   if (!state.outOrderNo) {
-    showToast('请输入订单号')
-    return
+    return showToast('请输入快手小店订单号')
+  }
+  if (!state.invoiceForm.category) {
+    return showToast('请选择发票类型')
+  }
+  if (!state.invoiceForm.purchaserName) {
+    return showToast(state.invoiceForm.type === '企业' ? '请选择发票抬头' : '请输入发票抬头')
   }
   showConfirmDialog({
     title: '提示',
@@ -140,6 +145,7 @@ function receiveCategory(val: any) {
 }
 
 onMounted(() => {
+  document.title = '快手店铺 - 订单开票'
   if (route.query.taxNumber && route.query.code) {
     state.taxNumber = route.query.taxNumber
     state.qrCode = route.query.code
@@ -164,7 +170,7 @@ onMounted(() => {
       <van-field
         v-model="state.outOrderNo"
         label="快手小店订单号"
-        placeholder="请输入快手订单号"
+        placeholder="请输入快手小店订单号"
         required
         @blur="getOrderDetail"
       />
