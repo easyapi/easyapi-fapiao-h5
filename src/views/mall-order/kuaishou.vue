@@ -1,6 +1,9 @@
 <script setup lang='ts'>
-import { showConfirmDialog, showDialog, showToast } from 'vant'
+import { showConfirmDialog, showToast } from 'vant'
 import makeMixins from '../make/mixins/make'
+import kuaishou01 from '@/assets/images/kuaishou-01.png'
+import kuaishou02 from '@/assets/images/kuaishou-02.png'
+import { showImagePreview } from 'vant';
 
 const { checkEmailMobile } = makeMixins()
 
@@ -12,8 +15,6 @@ const state = reactive({
     email: '',
   },
   keyboardShow: false,
-  isShow: false,
-  isHide: false,
   company: {
     companyId: '',
   },
@@ -34,6 +35,7 @@ const state = reactive({
     companyId: '',
     outOrderIds: '',
   },
+  showTip: false,
 })
 
 /**
@@ -63,16 +65,24 @@ function makeInvoice() {
  * 点击提示
  */
 function openTips() {
-  showDialog({
-    title: '温馨提示',
-    message: '代码是写出来给人看的，附带能在机器上运行。',
-  }).then(() => {
-    // on close
-  })
+  state.showTip = true
 }
 
-function receiveCompany(val) {
+const showPreview = (index: any) => {
+  // 调用函数式预览
+  showImagePreview({
+    images: [kuaishou01, kuaishou02],
+    startPosition: index,
+    closeable: true
+  });
+};
+
+function receiveCompany(val: any) {
   state.company = val
+}
+
+function receiveCategory(val) {
+  state.invoiceForm.category = val
 }
 </script>
 
@@ -85,14 +95,13 @@ function receiveCompany(val) {
       {{ state.shopName }}快手店铺——订单开票
     </div>
     <Invoice
-      :is-show="state.isShow"
-      :is-hide="state.isHide"
+      :is-show="false"
+      :is-hide="false"
       :invoice-form="state.invoiceForm"
       :company="state.company"
       @get-company="receiveCompany"
       @get-invoice-category="receiveCategory"
     />
-
     <van-cell-group title="订单信息" inset>
       <van-field
         v-model="state.orderForm.number"
@@ -129,8 +138,8 @@ function receiveCompany(val) {
       />
     </van-cell-group>
     <div class="tips">
-      <p>xxxxxx</p>
-      <p>xxxxxx</p>
+      <!-- <p>xxxxxx</p>
+      <p>xxxxxx</p> -->
     </div>
     <div class="bottom fixed-bottom-bgColor">
       <van-button type="primary" class="submit" block @click="makeInvoice">
@@ -138,8 +147,24 @@ function receiveCompany(val) {
       </van-button>
     </div>
   </div>
+  <van-dialog v-model:show="state.showTip" title="温馨提示">
+    <div class="img-tip">
+      <div>
+        <div class="tip-text">
+          第1步：找到商家客服，点击底部的订单查询。
+        </div>
+        <img src="@/assets/images/kuaishou-01.png" alt="" class="img-size"  @click="showPreview(0)" />
+      </div>
+      <div>
+        <div class="tip-text">
+          第2步，点击要开票的订单号后面的复制图标，复制快手订单编号。
+        </div>
+        <img src="@/assets/images/kuaishou-02.png" alt="" class="img-size"   @click="showPreview(1)" />
+      </div>
+    </div>
+  </van-dialog>
 </template>
 
-<style lang='less' scoped>
+<style lang='less'>
 @import './mall-order.less';
 </style>
