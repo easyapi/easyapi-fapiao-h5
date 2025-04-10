@@ -1,5 +1,5 @@
-import request from '@/utils/request'
 import { localStorage } from '@/utils/local-storage'
+import request from '@/utils/request'
 
 const invoice = {
   /**
@@ -72,8 +72,8 @@ const invoice = {
   getInvoiceListByOutOrderNo(outOrderNo: any): Promise<any> {
     return request.get(`/invoices/${outOrderNo}/query`, {
       params: {
-        accessToken: localStorage.get('accessToken')
-      }
+        accessToken: localStorage.get('accessToken'),
+      },
     })
   },
 }

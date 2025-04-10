@@ -201,9 +201,9 @@ function findFieldKeyList() {
         else if (setting.fieldKey === 'default-level') {
           state.invoiceForm.forEach((item: any) => {
             // if (item.tripPeopleForm.vehicleType === 2) {
-              item.tripPeopleForm.level = setting.fieldValue
-              item.selectLevel = []
-              item.selectLevel.push(setting.fieldValue)
+            item.tripPeopleForm.level = setting.fieldValue
+            item.selectLevel = []
+            item.selectLevel.push(setting.fieldValue)
             // }
           })
         }

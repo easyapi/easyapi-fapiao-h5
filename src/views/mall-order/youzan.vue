@@ -82,7 +82,7 @@ function receiveCompany(val) {
       <img src="https://qiniu.easyapi.com/mall/youzan.png">
     </div>
     <div class="title">
-      {{ state.shopName }}快手店铺——订单开票
+      {{ state.shopName }}有赞订单开票
     </div>
     <Invoice
       :is-show="state.isShow"

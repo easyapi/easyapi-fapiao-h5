@@ -4,10 +4,6 @@ import companyEdit from '@/views/company/edit/index.vue'
 
 import companyList from '@/views/company/list/index.vue'
 import error from '@/views/error.vue'
-import NProgress from 'nprogress'
-// https://router.vuejs.org/zh/
-import { createRouter, createWebHistory } from 'vue-router'
-import 'nprogress/nprogress.css'
 // 导入路由组件
 import mian from '@/views/index.vue'
 import invoiceDetail from '@/views/invoice/detail/index.vue'
@@ -16,15 +12,19 @@ import invoiceOutOrder from '@/views/invoice/out-order/index.vue'
 import makeCategory from '@/views/make/category/index.vue'
 import makeMergeOrder from '@/views/make/merge/merge-order.vue'
 import makeProduct from '@/views/make/product/index.vue'
-import makeSingleOrder from '@/views/make/single/index.vue'
 import singleOrderSuccess from '@/views/make/single-order-success.vue'
 import makeSingleQuery from '@/views/make/single-query/index.vue'
+import makeSingleOrder from '@/views/make/single/index.vue'
 import makeSuccess from '@/views/make/success.vue'
 import mallOrderJd from '@/views/mall-order/jd.vue'
 import mallOrderKuaishou from '@/views/mall-order/kuaishou.vue'
 import mallOrderYouZan from '@/views/mall-order/youzan.vue'
 import outOrder from '@/views/out-order/index.vue'
 import rule from '@/views/rule.vue'
+import NProgress from 'nprogress'
+// https://router.vuejs.org/zh/
+import { createRouter, createWebHistory } from 'vue-router'
+import 'nprogress/nprogress.css'
 
 NProgress.configure({ showSpinner: true })
 

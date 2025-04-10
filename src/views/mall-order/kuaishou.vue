@@ -54,7 +54,7 @@ function getOrderDetail() {
     forbidClick: true,
     duration: 0,
   })
-  let params = {
+  const params = {
     oid: state.outOrderNo,
     taxNumber: state.taxNumber,
   }
@@ -87,7 +87,7 @@ function onChange() {
  * 查找单条电商平台信息
  */
 function findMall() {
-  let params = {
+  const params = {
     taxNumber: state.taxNumber,
     qrCode: state.qrCode,
   }
@@ -149,7 +149,7 @@ async function makeInvoice() {
       forbidClick: true,
       duration: 0,
     })
-    let data = {
+    const data = {
       ...state.orderDetail,
       ...state.invoiceForm,
       mallCode: 'kuaishou',
@@ -217,12 +217,13 @@ function copyLink() {
 }
 
 onMounted(() => {
-  document.title = '快手小店 - 订单开票'
+  document.title = '快手小店订单开票'
   if (route.query.taxNumber && route.query.qrCode) {
     state.taxNumber = route.query.taxNumber
     state.qrCode = route.query.qrCode
     findMall()
-  } else {
+  }
+  else {
     showToast('请联系小店客服，重新索取开票地址或二维码')
     return
   }

@@ -64,7 +64,7 @@ function openTips() {
       <img src="https://qiniu.easyapi.com/mall/jd.png">
     </div>
     <div class="title">
-      {{ state.shopName }}京东店铺 - 订单开票
+      {{ state.shopName }}京东商城订单开票
     </div>
 
     <van-cell-group title="京东订单信息（已在京东申请开票的订单）" inset>

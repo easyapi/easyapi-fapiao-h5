@@ -1,7 +1,7 @@
 <script setup lang='ts'>
 import type { ConfigProviderTheme } from 'vant'
-import { localStorage } from '@/utils/local-storage'
 import { useStore } from '@/stores'
+import { localStorage } from '@/utils/local-storage'
 
 const store = useStore()
 const theme = ref<ConfigProviderTheme>('light')

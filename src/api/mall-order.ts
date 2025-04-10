@@ -14,8 +14,8 @@ const mallOrder = {
   getOrderDetail(params: any): Promise<any> {
     return request.get('/ks/order-detail', {
       params: {
-        ...params
-      }
+        ...params,
+      },
     })
   },
 
@@ -32,10 +32,10 @@ const mallOrder = {
   findMall(params: any): Promise<any> {
     return request.get('/shop/mall/find', {
       params: {
-        ...params
-      }
+        ...params,
+      },
     })
-  }
+  },
 }
 
 export default mallOrder
