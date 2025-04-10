@@ -77,6 +77,12 @@ function getOrderDetail() {
   })
 }
 
+function onChange() {
+  if (state.outOrderNo.length === 16) {
+    getOrderDetail()
+  }
+}
+
 /**
  * 查找单条电商平台信息
  */
@@ -238,9 +244,15 @@ onMounted(() => {
         label="快手小店订单号"
         placeholder="请输入快手小店订单号"
         required
-        right-icon="search"
-        @click-right-icon="getOrderDetail"
-      />
+        @blur="getOrderDetail"
+        @input="onChange"
+      >
+        <template #button>
+          <van-button size="small" icon="search" type="primary" @click="getOrderDetail">
+            查询
+          </van-button>
+        </template>
+      </van-field>
       <van-field
         v-if="state.orderDetail && state.orderDetail.price"
         v-model="state.orderDetail.price"
@@ -267,6 +279,11 @@ onMounted(() => {
           required
         />
       </van-cell-group>
+    </div>
+    <div class="tips">
+      <p>注：</p>
+      <p>1、请确认快手小店订单是否已签收，签收完成后方可申请开票</p>
+      <p>2、开票申请提交后，请耐心等待审核开具，预计24-48小时完成</p>
     </div>
     <div class="bottom fixed-bottom-bgColor">
       <van-button type="primary" class="submit" block @click="makeInvoice">
