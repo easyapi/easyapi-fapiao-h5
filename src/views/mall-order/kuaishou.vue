@@ -222,6 +222,9 @@ onMounted(() => {
     state.taxNumber = route.query.taxNumber
     state.qrCode = route.query.qrCode
     findMall()
+  } else {
+    showToast('请联系小店客服，重新索取开票地址或二维码')
+    return
   }
   if (sessionStorage.getItem('orderDetail')) {
     state.orderDetail = JSON.parse(sessionStorage.getItem('orderDetail'))
