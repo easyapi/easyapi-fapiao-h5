@@ -252,8 +252,8 @@ onMounted(() => {
       {{ state.shopInfo?.shopName }} 快手小店订单开票
     </div>
     <van-cell-group title="订单信息" inset>
-      <van-field v-model="state.outOrderNo" label="快手小店订单编号" placeholder="请输入快手小店订单编号" required clearable
-        @blur="getOrderDetail" @input="onChange" @clear="clearOrderDetail">
+      <van-field v-model="state.outOrderNo" label="快手小店订单编号" placeholder="请输入快手小店订单编号" required
+        clearable @input="onChange" @clear="clearOrderDetail">
         <template #button>
           <van-button size="small" icon="search" type="primary" @click="getOrderDetail">
             查询
