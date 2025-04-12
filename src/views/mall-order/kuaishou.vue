@@ -46,9 +46,6 @@ function getOrderDetail() {
   if (state.outOrderNo.length !== 16) {
     return showToast('快手小店订单号为16位，请仔细检查')
   }
-  if (state.orderDetail && state.outOrderNo === state.orderDetail.outOrderNo) {
-    return
-  }
   showLoadingToast({
     message: '加载中...',
     forbidClick: true,
@@ -80,7 +77,6 @@ function onChange() {
     getOrderDetail()
     return
   }
-  console.log(12312)
   if (state.orderDetail) {
     clearOrderDetail()
   }
