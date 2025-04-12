@@ -68,18 +68,21 @@ function getOrderDetail() {
       state.orderDetail = res.content
     }
     else {
-      state.orderDetail = null
-      sessionStorage.removeItem('orderDetail')
+      clearOrderDetail()
     }
   }).catch(() => {
-    state.orderDetail = null
-    sessionStorage.removeItem('orderDetail')
+    clearOrderDetail()
   })
 }
 
 function onChange() {
   if (state.outOrderNo.length === 16) {
     getOrderDetail()
+    return
+  }
+  console.log(12312)
+  if (state.orderDetail) {
+    clearOrderDetail()
   }
 }
 
@@ -163,8 +166,7 @@ async function makeInvoice() {
       if (res.code === 1) {
         showToast(res.message)
         state.outOrderNo = ''
-        state.orderDetail = null
-        sessionStorage.removeItem('orderDetail')
+        clearOrderDetail()
       }
     })
   })
@@ -200,9 +202,12 @@ function gotoDetail(id: any) {
     return
   }
   router.push({ path: '/invoice/detail', query: { id } })
-  sessionStorage.removeItem('orderDetail')
+  clearOrderDetail()
 }
 
+/**
+ * 复制
+ */
 function copyLink() {
   state.ifCopy = true
   const newClipboard = new Clipboard('.copyBtn')
@@ -214,6 +219,14 @@ function copyLink() {
     showToast('复制失败')
     state.ifCopy = false
   })
+}
+
+/**
+ * 清除订单详情
+ */
+function clearOrderDetail() {
+  state.orderDetail = null
+  sessionStorage.removeItem('orderDetail')
 }
 
 onMounted(() => {
@@ -243,45 +256,25 @@ onMounted(() => {
       {{ state.shopInfo?.shopName }} 快手小店订单开票
     </div>
     <van-cell-group title="订单信息" inset>
-      <van-field
-        v-model="state.outOrderNo"
-        label="快手小店订单编号"
-        placeholder="请输入快手小店订单编号"
-        required
-        @blur="getOrderDetail"
-        @input="onChange"
-      >
+      <van-field v-model="state.outOrderNo" label="快手小店订单编号" placeholder="请输入快手小店订单编号" required clearable
+        @blur="getOrderDetail" @input="onChange" @clear="clearOrderDetail">
         <template #button>
           <van-button size="small" icon="search" type="primary" @click="getOrderDetail">
             查询
           </van-button>
         </template>
       </van-field>
-      <van-field
-        v-if="state.orderDetail && state.orderDetail.price"
-        v-model="state.orderDetail.price"
-        label="开票金额"
-        readonly
-        class="price"
-      />
+      <van-field v-if="state.orderDetail && state.orderDetail.price" v-model="state.orderDetail.price" label="开票金额"
+        readonly class="price" />
     </van-cell-group>
     <div class="tips-forget" @click="openTips">
       我不知道快手小店订单编号在哪里
     </div>
     <div v-if="state.orderDetail">
-      <Invoice
-        :is-show="false"
-        :is-hide="false"
-        :invoice-form="state.invoiceForm"
-        @get-invoice-category="receiveCategory"
-      />
+      <Invoice :is-show="false" :is-hide="false" :invoice-form="state.invoiceForm"
+        @get-invoice-category="receiveCategory" />
       <van-cell-group title="接收方式" inset>
-        <van-field
-          v-model="state.invoiceForm.email"
-          label="邮箱"
-          placeholder="请输入接收邮箱"
-          required
-        />
+        <van-field v-model="state.invoiceForm.email" label="邮箱" placeholder="请输入接收邮箱" required />
       </van-cell-group>
     </div>
     <div class="tips">
@@ -312,12 +305,8 @@ onMounted(() => {
     </van-dialog>
     <van-dialog v-model:show="state.showInvoiceListDialog" title="开票记录" close-on-click-overlay>
       <div class="record-list">
-        <div
-          v-for="(item, index) in state.invoiceList"
-          :key="index"
-          class="record-list_item"
-          @click="gotoDetail(item.invoiceId)"
-        >
+        <div v-for="(item, index) in state.invoiceList" :key="index" class="record-list_item"
+          @click="gotoDetail(item.invoiceId)">
           <div class="record-list_item_top">
             <div>
               <span class="price">￥{{ item.price }}</span>
@@ -333,7 +322,8 @@ onMounted(() => {
             </p>
             <p class="record-list_item_bottom_time">
               <span>{{ item.addTime }}</span>
-              <van-button v-if="item.state === 1" class="copyBtn" size="mini" type="primary" data-clipboard-action="copy" :data-clipboard-text="copyText(item)" @click="copyLink">
+              <van-button v-if="item.state === 1" class="copyBtn" size="mini" type="primary"
+                data-clipboard-action="copy" :data-clipboard-text="copyText(item)" @click="copyLink">
                 复制发票信息
               </van-button>
             </p>
