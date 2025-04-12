@@ -245,8 +245,8 @@ onMounted(() => {
     <van-cell-group title="订单信息" inset>
       <van-field
         v-model="state.outOrderNo"
-        label="快手小店订单号"
-        placeholder="请输入快手小店订单号"
+        label="快手小店订单编号"
+        placeholder="请输入快手小店订单编号"
         required
         @blur="getOrderDetail"
         @input="onChange"
@@ -260,13 +260,13 @@ onMounted(() => {
       <van-field
         v-if="state.orderDetail && state.orderDetail.price"
         v-model="state.orderDetail.price"
-        label="订单金额"
+        label="开票金额"
         readonly
         class="price"
       />
     </van-cell-group>
     <div class="tips-forget" @click="openTips">
-      我不知道快手小店订单号在哪里
+      我不知道快手小店订单编号在哪里
     </div>
     <div v-if="state.orderDetail">
       <Invoice
