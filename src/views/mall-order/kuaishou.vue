@@ -29,6 +29,7 @@ const state = reactive({
     purchaserBank: '',
     purchaserBankAccount: '',
     email: '',
+    remark: '',
   },
   showTipDialog: false,
   showInvoiceListDialog: false,
@@ -167,6 +168,8 @@ function makeInvoice() {
       shopName: state.shopInfo.shopName,
       shopCode: state.shopInfo.shopCode,
     }
+    // 快手订单默认在备注中增加订单编号
+    data.remark = `${data.remark ? `${data.remark}\n` : ''}订单编号：${data.outOrderNo}`
     delete data.companyId
     mallOrder.createMallOrder(data).then((res) => {
       closeToast()
