@@ -164,7 +164,7 @@ onMounted(() => {
         v-if="state.outOrderCount > 0" :title="`1张发票，含${state.outOrderCount}个订单`"
         :label="state.invoiceDetail.updateTime" is-link @click="gotoOutOrder"
       />
-      <van-cell v-if="state.invoiceDetail.consoleReason" title="未通过原因：">
+      <van-cell v-if="state.invoiceDetail.consoleReason" title="原因：">
         <van-tag type="warning">
           {{ state.invoiceDetail.consoleReason }}
         </van-tag>

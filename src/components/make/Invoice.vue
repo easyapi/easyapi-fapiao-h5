@@ -39,6 +39,7 @@ const state = reactive({
     purchaserBankAccount: '',
     companyId: '',
     addressId: '',
+    email: '',
   },
   childCompany: {
     name: '',
@@ -97,6 +98,7 @@ function getDefaultCompany() {
       state.childInvoiceForm.purchaserBankAccount
         = state.childCompany.bankAccount
       state.childInvoiceForm.companyId = state.childCompany.companyId
+      state.childInvoiceForm.email = state.childCompany.email
     }
   })
 }

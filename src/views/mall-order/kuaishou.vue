@@ -46,6 +46,7 @@ function getOrderDetail() {
   if (state.outOrderNo.length !== 16) {
     return showToast('快手小店订单编号为16位，请仔细检查')
   }
+  clearOrderDetail()
   showLoadingToast({
     message: '加载中...',
     forbidClick: true,
@@ -64,11 +65,6 @@ function getOrderDetail() {
       }
       state.orderDetail = res.content
     }
-    else {
-      clearOrderDetail()
-    }
-  }).catch(() => {
-    clearOrderDetail()
   })
 }
 
@@ -115,10 +111,17 @@ function getInvoiceListByOutOrderNo() {
   })
 }
 
+function onConfirm() {
+  state.showInvoiceListDialog = false
+  if (state.invoiceList.length && state.invoiceList[0].statements === '已红冲') {
+    makeInvoice()
+  }
+}
+
 /**
  * 点击开票
  */
-async function makeInvoice() {
+async function gotoMakeInvoice() {
   if (!state.outOrderNo) {
     return showToast('请输入快手小店订单编号')
   }
@@ -139,6 +142,14 @@ async function makeInvoice() {
     state.showInvoiceListDialog = true
     return
   }
+  // 发票开具
+  makeInvoice()
+}
+
+/**
+ * 发票开具
+ */
+function makeInvoice() {
   showConfirmDialog({
     title: '提示',
     message: '确认抬头和邮箱正确并申请开票吗？',
@@ -253,8 +264,8 @@ onMounted(() => {
     </div>
     <van-cell-group title="订单信息" inset>
       <van-field
-        v-model="state.outOrderNo" label="快手小店订单编号" placeholder="请输入快手小店订单编号" required
-        clearable @input="onChange" @clear="clearOrderDetail"
+        v-model="state.outOrderNo" label="快手小店订单编号" placeholder="请输入快手小店订单编号" required clearable
+        @input="onChange" @clear="clearOrderDetail"
       >
         <template #button>
           <van-button size="small" icon="search" type="primary" @click="getOrderDetail">
@@ -285,7 +296,7 @@ onMounted(() => {
       <p>2、开票申请提交后，请耐心等待审核开具，预计24-48小时完成</p>
     </div>
     <div class="bottom fixed-bottom-bgColor">
-      <van-button type="primary" class="submit" block @click="makeInvoice">
+      <van-button type="primary" class="submit" block @click="gotoMakeInvoice">
         开票
       </van-button>
     </div>
@@ -305,7 +316,12 @@ onMounted(() => {
         </div>
       </div>
     </van-dialog>
-    <van-dialog v-model:show="state.showInvoiceListDialog" title="开票记录" close-on-click-overlay>
+    <van-dialog
+      v-model:show="state.showInvoiceListDialog" title="开票记录"
+      :show-cancel-button="state.invoiceList.length && state.invoiceList[0].statements === '已红冲'"
+      :confirm-button-text="state.invoiceList.length && state.invoiceList[0].statements === '已红冲' ? '再次开具' : '确认'"
+      close-on-click-overlay @confirm="onConfirm"
+    >
       <div class="record-list">
         <div
           v-for="(item, index) in state.invoiceList" :key="index" class="record-list_item"
