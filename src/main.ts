@@ -3,6 +3,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import { Dialog } from "vant";
 
 import './app.less'
 
@@ -13,6 +14,6 @@ const app = createApp(App)
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
 
-app.use(router).use(pinia)
+app.use(router).use(pinia).use(Dialog)
 
 app.mount('#app')

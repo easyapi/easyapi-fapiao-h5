@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import customCategory from '@/api/custom-category'
+import invoice from '@/api/invoice'
 import make from '@/api/make'
 import qiniu from '@/api/qiniu'
 import { useStore } from '@/stores'
 import { localStorage } from '@/utils/local-storage'
 import { verificationSpecificBusiness } from '@/utils/specific-business'
 import { validPrice } from '@/utils/validate'
+import dayjs from 'dayjs'
 import { closeToast, showConfirmDialog, showLoadingToast, showToast } from 'vant'
 import makeMixins from '../mixins/make'
 
@@ -55,6 +57,9 @@ const state = reactive({
   },
   init: false,
   tripData: null,
+  recentRecords: [],
+  show: false,
+  selectData: {} as any,
 })
 
 function getToken() {
@@ -126,24 +131,41 @@ function getCustomCategoryList() {
   })
 }
 
+function getRecentRecords() {
+  const params = {
+    size: 999,
+    page: 0,
+    startAddTime: dayjs().subtract(3, 'day').format('YYYY-MM-DD 00:00:00'),
+    endAddTime: dayjs().format('YYYY-MM-DD HH:mm:ss'),
+  }
+  invoice.getInvoiceList(params).then((res) => {
+    if (res.code === 1) {
+      state.recentRecords = res.content
+    }
+    else {
+      state.recentRecords = []
+    }
+  })
+}
+
+function gotoFind() {
+  router.push('/invoice/list')
+}
+
 /**
- * 开具发票
+ * 近期查询
  */
-function makeInvoice() {
+function recentVerify() {
   if (state.invoiceForm.type === '个人' && state.invoiceForm.purchaserName === '')
     return showToast('请输入发票抬头')
-
   if (state.customCategory === null || state.customCategory.customCategoryId === null)
     return showToast('请选择发票类别')
-
   if (state.invoiceForm.price === null || state.invoiceForm.price <= 0)
     return showToast('请输入开票金额')
   else if (!validPrice(state.invoiceForm.price))
     return showToast('请输入合法开票金额，最多2位小数')
-
   if (common.ifCategoryMakeFileRequired && state.fieldValue.length === 0)
     return showToast('附件一栏请上传付款记录凭证')
-
   if (!checkEmailMobile(state.invoiceForm))
     return
   if (state.invoiceForm.specificBusinessCode === '09' && state.tripData) {
@@ -152,6 +174,20 @@ function makeInvoice() {
     }
     state.invoiceForm.specificBusiness = state.tripData
   }
+  let arr = state.recentRecords.filter(item => item.purchaserName === state.invoiceForm.purchaserName && Number(item.price) === Number(state.invoiceForm.price))
+  if (arr.length > 0) {
+    state.selectData = arr[0]
+    state.show = true
+  }
+  else {
+    makeInvoice()
+  }
+}
+
+/**
+ * 开具发票
+ */
+function makeInvoice() {
   showConfirmDialog({
     title: '提示',
     message: '确认抬头和金额正确并申请开票吗？',
@@ -220,88 +256,83 @@ onMounted(async () => {
   getInvoiceRemark()
   ifNeedMobileEmail()
   ifCategoryMakeFileRequired()
+  getRecentRecords()
 })
 </script>
 
 <template>
-  <Header v-if="store.ifShowH5NavBar" header-title="开具电子发票" />
-  <div class="make-invoice">
-    <Invoice
-      v-if="state.init"
-      :is-show="state.isShow"
-      :is-hide="state.isHide"
-      :invoice-form="state.invoiceForm"
-      :company="state.company"
-      @get-company="receiveCompany"
-      @get-invoice-category="receiveCategory"
-    />
-    <van-cell-group title="发票内容" inset>
-      <van-field
-        v-model="state.customCategory.name"
-        readonly
-        clickable
-        label="发票类别"
-        placeholder="选择发票类别"
-        required
-        @click="state.showCustomCategory = true"
+  <div>
+    <Header v-if="store.ifShowH5NavBar" header-title="开具电子发票" />
+    <div class="make-invoice">
+      <Invoice
+        v-if="state.init" :is-show="state.isShow" :is-hide="state.isHide" :invoice-form="state.invoiceForm"
+        :company="state.company" @get-company="receiveCompany" @get-invoice-category="receiveCategory"
       />
-      <van-popup v-model:show="state.showCustomCategory" round position="bottom">
-        <van-picker
-          show-toolbar
-          :columns="state.customCategoryList"
-          @cancel="state.showCustomCategory = false"
-          @confirm="onConfirm"
+      <van-cell-group title="发票内容" inset>
+        <van-field
+          v-model="state.customCategory.name" readonly clickable label="发票类别" placeholder="选择发票类别" required
+          @click="state.showCustomCategory = true"
         />
-      </van-popup>
-      <van-field
-        v-model="state.invoiceForm.price"
-        class="merge-order_price"
-        readonly
-        clickable
-        label="发票金额"
-        placeholder="请准确输入开票金额"
-        required
-        @touchstart.stop="state.keyboardShow = true"
-      />
-      <van-number-keyboard
-        v-model="state.invoiceForm.price"
-        :show="state.keyboardShow"
-        theme="custom"
-        extra-key="."
-        close-button-text="完成"
-        @blur="state.keyboardShow = false"
-      />
-      <van-field
-        v-model="state.invoiceForm.remark"
-        label="发票备注"
-        :placeholder="common.remarkPlaceholder"
-      />
-      <van-cell title="附件" label="可上传最多5张" :required="common.ifCategoryMakeFileRequired">
-        <van-uploader
-          v-model="state.imageList"
-          :max-count="5"
-          :data="{ key: state.qnKey, token: state.qnToken }"
-          :after-read="onAfterRead"
-          :before-delete="deleteFieldValue"
+        <van-popup v-model:show="state.showCustomCategory" round position="bottom">
+          <van-picker
+            show-toolbar :columns="state.customCategoryList" @cancel="state.showCustomCategory = false"
+            @confirm="onConfirm"
+          />
+        </van-popup>
+        <van-field
+          v-model="state.invoiceForm.price" class="merge-order_price" readonly clickable label="发票金额"
+          placeholder="请准确输入开票金额" required @touchstart.stop="state.keyboardShow = true"
         />
-      </van-cell>
-    </van-cell-group>
-    <TripPeople v-if="state.invoiceForm.specificBusinessCode === '09'" @get-trip-people="getTripPeople" />
-    <Receive
-      v-if="state.init"
-      :invoice-form="state.invoiceForm"
-      :if-need-email="common.ifNeedEmail"
-      :if-need-mobile="common.ifNeedMobile"
-      :address="state.address"
-    />
-    <div class="bottom fixed-bottom-bgColor">
-      <van-button type="primary" class="submit" block @click="makeInvoice">
-        申请开票
-      </van-button>
+        <van-number-keyboard
+          v-model="state.invoiceForm.price" :show="state.keyboardShow" theme="custom" extra-key="."
+          close-button-text="完成" @blur="state.keyboardShow = false"
+        />
+        <van-field v-model="state.invoiceForm.remark" label="发票备注" :placeholder="common.remarkPlaceholder" />
+        <van-cell title="附件" label="可上传最多5张" :required="common.ifCategoryMakeFileRequired">
+          <van-uploader
+            v-model="state.imageList" :max-count="5" :data="{ key: state.qnKey, token: state.qnToken }"
+            :after-read="onAfterRead" :before-delete="deleteFieldValue"
+          />
+        </van-cell>
+      </van-cell-group>
+      <TripPeople v-if="state.invoiceForm.specificBusinessCode === '09'" @get-trip-people="getTripPeople" />
+      <Receive
+        v-if="state.init" :invoice-form="state.invoiceForm" :if-need-email="common.ifNeedEmail"
+        :if-need-mobile="common.ifNeedMobile" :address="state.address"
+      />
+      <div class="bottom fixed-bottom-bgColor">
+        <van-button type="primary" class="submit" block @click="recentVerify">
+          申请开票
+        </van-button>
+      </div>
     </div>
+    <van-dialog v-model:show="state.show" title="提示" show-cancel-button @confirm="makeInvoice">
+      <div class="dialog-content">
+        您在 <span>{{ state.selectData.addTime }}</span> 有一笔相同金额的订单，是否再次提交？
+        <div @click="gotoFind">
+          点击前往查看
+        </div>
+      </div>
+    </van-dialog>
   </div>
 </template>
 
 <style lang="less">
 @import '../make.less';
+
+.dialog-content {
+  padding: 20px;
+  color: #323233;
+
+  span {
+    color: #1989FA;
+  }
+
+  div {
+    width: 100%;
+    text-align: center;
+    color: #1989FA;
+    margin-top: 10px;
+  }
+}
 </style>
