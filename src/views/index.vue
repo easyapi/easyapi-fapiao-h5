@@ -98,7 +98,6 @@ onMounted(() => {
       <van-cell title="开票记录" is-link to="/invoice/list" />
       <van-cell title="开票规则" is-link to="/rule" />
       <van-cell title="抬头管理" is-link :to="{ path: '/company/list', query: { from: 'index' } }" />
-      <van-cell title="地址管理" is-link :to="{ path: '/address/list', query: { from: 'index' } }" />
     </van-cell-group>
     <div class="remark">
       <div v-html="state.remark" />

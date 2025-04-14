@@ -1,5 +1,3 @@
-import addressEdit from '@/views/address/edit/index.vue'
-import addressList from '@/views/address/list/index.vue'
 import companyEdit from '@/views/company/edit/index.vue'
 
 import companyList from '@/views/company/list/index.vue'
@@ -69,16 +67,6 @@ const routes = [
     path: '/company/edit',
     name: 'companyEdit',
     component: companyEdit,
-  },
-  {
-    path: '/address/list',
-    name: 'addressList',
-    component: addressList,
-  },
-  {
-    path: '/address/edit',
-    name: 'addressEdit',
-    component: addressEdit,
   },
   {
     path: '/make/product',

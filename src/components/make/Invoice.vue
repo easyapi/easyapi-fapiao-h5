@@ -90,13 +90,11 @@ function getDefaultCompany() {
       state.childCompany = res.content
       emits('getCompany', state.childCompany)
       state.childInvoiceForm.purchaserName = state.childCompany.name
-      state.childInvoiceForm.purchaserTaxpayerNumber
-        = state.childCompany.taxNumber
+      state.childInvoiceForm.purchaserTaxpayerNumber = state.childCompany.taxNumber
       state.childInvoiceForm.purchaserAddress = state.childCompany.address
       state.childInvoiceForm.purchaserPhone = state.childCompany.phone
       state.childInvoiceForm.purchaserBank = state.childCompany.bank
-      state.childInvoiceForm.purchaserBankAccount
-        = state.childCompany.bankAccount
+      state.childInvoiceForm.purchaserBankAccount = state.childCompany.bankAccount
       state.childInvoiceForm.companyId = state.childCompany.companyId
       state.childInvoiceForm.email = state.childCompany.email
     }
