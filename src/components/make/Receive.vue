@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import address from '@/api/address'
 import customer from '@/api/customer'
 import setting from '@/api/setting'
 
@@ -47,17 +46,7 @@ function gotoAddress() {
     },
   })
 }
-/**
- * 获取默认地址
- */
-function getDefaultAddress() {
-  address.getDefaultAddress('test').then((res) => {
-    if (res.code === 1) {
-      state.childAddress = res.content
-      state.childForm.addressId = state.childAddress.addressId
-    }
-  })
-}
+
 /**
  * 获取开票用户信息
  */
@@ -82,7 +71,6 @@ function findSetting() {
 onMounted(() => {
   state.childForm = props.invoiceForm
   findSetting()
-  getDefaultAddress()
   getCustomer()
 })
 </script>

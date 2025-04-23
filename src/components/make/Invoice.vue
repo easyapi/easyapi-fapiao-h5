@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import address from '@/api/address'
 import company from '@/api/company'
 import setting from '@/api/setting'
 import { invoiceTag } from '@/utils/invoice-category'
@@ -101,21 +100,10 @@ function getDefaultCompany() {
   })
 }
 
-function getDefaultAddress() {
-  // todo username更换
-  address.getDefaultAddress('test').then((res) => {
-    if (res.code === 1) {
-      state.address = res.content
-      state.childInvoiceForm.addressId = state.address.addressId
-    }
-  })
-}
-
 function selectInvoiceType() {
   localStorage.set('type', state.childInvoiceForm.type)
   if (state.childInvoiceForm.type === '企业') {
     getDefaultCompany()
-    getDefaultAddress()
   }
   else if (state.childInvoiceForm.type === '个人') {
     state.childInvoiceForm.purchaserName = ''
