@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const useStore = defineStore({
-  id: 'index',
+export const useStore = defineStore('index', {
   persist: true,
   state: () => ({
     // light || dark

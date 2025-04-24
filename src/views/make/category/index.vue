@@ -174,7 +174,7 @@ function recentVerify() {
     }
     state.invoiceForm.specificBusiness = state.tripData
   }
-  let arr = state.recentRecords.filter(item => item.purchaserName === state.invoiceForm.purchaserName && Number(item.price) === Number(state.invoiceForm.price))
+  const arr = state.recentRecords.filter(item => item.purchaserName === state.invoiceForm.purchaserName && Number(item.price) === Number(state.invoiceForm.price))
   if (arr.length > 0) {
     state.selectData = arr[0]
     state.show = true
