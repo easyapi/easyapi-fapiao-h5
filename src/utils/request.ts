@@ -36,7 +36,9 @@ function errorHandler(error: RequestError): Promise<any> {
       // 如果你需要直接跳转登录页面
       // location.replace(loginRoutePath)
     }
-    showToast(error.response.data.message)
+    if (error.response.data.message) {
+      showToast(error.response.data.message)
+    }
   }
   return Promise.reject(error)
 }
