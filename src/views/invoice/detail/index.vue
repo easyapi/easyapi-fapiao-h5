@@ -229,7 +229,7 @@ onMounted(() => {
       </div>
       <van-field v-model="state.email" clickable label="邮箱" placeholder="请输入邮箱" required border />
       <van-button type="primary" block @click="sendToEmail">
-        确认
+        发送
       </van-button>
     </van-popup>
     <van-popup v-model:show="state.popupVisible" style="padding: 30px" align="center">
