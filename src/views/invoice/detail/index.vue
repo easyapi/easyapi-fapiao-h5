@@ -85,6 +85,7 @@ function getInvoiceDetail() {
     closeToast()
     if (res.code === 1) {
       state.invoiceDetail = res.content
+      state.invoiceDetail.downloadUrl = res.content.downloadUrl ? res.content.downloadUrl : res.content.electronicInvoiceUrl
       state.copyInfo = copyText(res.content)
       state.attachList = res.content.invoiceExtends && res.content.invoiceExtends.length > 0 ? res.content.invoiceExtends.filter(item => item.fieldKey === 'attch' && item.fieldValue)[0].fieldValue.split(',') : []
       showIdTypeAndVehicle()
@@ -243,14 +244,14 @@ onMounted(() => {
       <div style="margin-bottom: 10px">
         <van-button
           type="primary" data-clipboard-action="copy" class="copyPdfUrl submit"
-          :data-clipboard-text="state.copyInfo" @click="copyLink"
+          :data-clipboard-text="state.invoiceDetail.downloadUrl" @click="copyLink"
         >
           复制发票下载地址
         </van-button>
       </div>
       <div style="width: 100%; font-size: 12px">
         <van-field
-          v-model="state.invoiceDetail.electronicInvoiceUrl" rows="1" autosize type="textarea" class="textarea"
+          v-model="state.invoiceDetail.downloadUrl" rows="1" autosize type="textarea" class="textarea"
           readonly
         />
       </div>
