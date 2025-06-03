@@ -3,10 +3,11 @@ import invoice from '@/api/invoice'
 import outOrder from '@/api/out-order'
 import { useStore } from '@/stores'
 import { idTypes, vehicleTypes } from '@/utils/business'
+import { triggerDownload } from '@/utils/download'
 import { copyText } from '@/utils/invoice'
 import { getIconByStatements } from '@/utils/invoice-category'
 import Clipboard from 'clipboard'
-import { closeToast, showImagePreview, showLoadingToast, showToast } from 'vant'
+import { closeToast, showDialog, showImagePreview, showLoadingToast, showToast } from 'vant'
 
 const store = useStore()
 const route = useRoute()
@@ -62,7 +63,14 @@ function gotoOutOrder() {
   })
 }
 
-function copyLink() {
+function copyLink(value) {
+  if (value) {
+    showDialog({
+      title: '发票信息',
+      message: `<div class="copy_invoice">${state.copyInfo}<div>`,
+      allowHtml: true,
+    })
+  }
   const newClipboard = new Clipboard('.copyPdfUrl')
   newClipboard.on('success', () => {
     showToast('复制成功')
@@ -145,6 +153,15 @@ function showIdTypeAndVehicle() {
   })
 }
 
+async function downloadInvoice() {
+  try {
+    await triggerDownload(state.invoiceDetail.electronicInvoiceUrl ? state.invoiceDetail.electronicInvoiceUrl : state.invoiceDetail.downloadUrl)
+  }
+  catch {
+    showToast('下载失败，请重试')
+  }
+}
+
 onMounted(() => {
   document.title = '发票详情'
   getInvoiceDetail()
@@ -174,8 +191,8 @@ onMounted(() => {
     <van-cell-group title="发票详情" inset>
       <van-cell :value="state.invoiceDetail.purchaserName" title="发票抬头" />
       <van-cell :value="state.invoiceDetail.purchaserTaxpayerNumber" title="税号" />
-      <van-cell :value="`${state.invoiceDetail.purchaserAddress}  ${state.invoiceDetail.purchaserPhone}`" title="地址、电话" />
-      <van-cell :value="`${state.invoiceDetail.purchaserBank}  ${state.invoiceDetail.purchaserBankAccount}`" title="开户行及账号" />
+      <van-cell :value="`${state.invoiceDetail.purchaserAddress}&nbsp;&nbsp;${state.invoiceDetail.purchaserPhone}`" title="地址、电话" />
+      <van-cell :value="`${state.invoiceDetail.purchaserBank}&nbsp;&nbsp;${state.invoiceDetail.purchaserBankAccount}`" title="开户行及账号" />
       <van-cell :value="state.invoiceDetail.price" title="发票金额">
         ￥{{ state.invoiceDetail.price }}
       </van-cell>
@@ -216,7 +233,7 @@ onMounted(() => {
     <van-action-bar v-if="state.invoiceDetail.state === 1">
       <van-action-bar-button
         data-clipboard-action="copy" class="copyPdfUrl" :data-clipboard-text="state.copyInfo"
-        color="#01a8b9" text="复制发票信息" @click="copyLink"
+        color="#01a8b9" text="复制发票信息" @click="copyLink(true)"
       />
       <van-action-bar-button color="#409eff" text="预览发票" @click="viewPicture" />
       <van-action-bar-button
@@ -233,31 +250,40 @@ onMounted(() => {
         发送
       </van-button>
     </van-popup>
-    <van-popup v-model:show="state.popupVisible" style="padding: 30px" align="center">
-      <p style="font-size: 18px; margin-bottom: 20px">
-        发票预览
-      </p>
-      <img
-        :src="state.invoiceDetail.electronicInvoiceImg" alt="" class="electronic"
-        @click="viewImagePreview([state.invoiceDetail.electronicInvoiceImg], 0)"
-      >
-      <div style="margin-bottom: 10px">
-        <van-button
-          type="primary" data-clipboard-action="copy" class="copyPdfUrl submit"
-          :data-clipboard-text="state.invoiceDetail.downloadUrl" @click="copyLink"
-        >
-          复制发票下载地址
-        </van-button>
+    <van-popup v-model:show="state.popupVisible">
+      <div class="invoice-preview">
+        <div class="title">
+          发票预览
+        </div>
+        <img :src="state.invoiceDetail.electronicInvoiceImg" alt="" @click="viewImagePreview([state.invoiceDetail.electronicInvoiceImg], 0)">
+        <div class="downloadUrl">
+          <span>发票下载地址：</span>
+          <a :href="state.invoiceDetail.downloadUrl">{{ state.invoiceDetail.downloadUrl }}</a>
+        </div>
+        <div class="copyPdfUrl_btn">
+          <div>
+            <van-button
+              type="primary"
+              data-clipboard-action="copy"
+              class="copyPdfUrl"
+              :data-clipboard-text="state.invoiceDetail.downloadUrl"
+              block
+              @click="copyLink(false)"
+            >
+              仅复制下载地址
+            </van-button>
+          </div>
+          <div>
+            <van-button
+              type="success"
+              block
+              @click="downloadInvoice"
+            >
+              发票下载
+            </van-button>
+          </div>
+        </div>
       </div>
-      <div style="width: 100%; font-size: 12px">
-        <van-field
-          v-model="state.invoiceDetail.downloadUrl" rows="1" autosize type="textarea" class="textarea"
-          readonly
-        />
-      </div>
-      <p style="margin-top: 10px">
-        复制发票下载地址并在浏览器中打开进行下载
-      </p>
     </van-popup>
   </div>
 </template>
@@ -292,15 +318,6 @@ onMounted(() => {
   }
 }
 
-.electronic {
-  width: 100%;
-}
-
-.textarea {
-  width: 100%;
-  border: 0.5px solid #bbbbbb;
-}
-
 .send-email {
   padding: 20px;
 
@@ -313,18 +330,17 @@ onMounted(() => {
     flex-wrap: nowrap;
   }
 }
+
+.copy_invoice {
+  word-break: break-all !important;
+  text-align: left !important;
+  line-height: 24px;
+}
 </style>
 
 <style lang='less' scoped>
 .invoice-detail {
   padding-top: 80px;
-
-  .submit {
-    border: none;
-    height: 40px;
-    border-radius: 5px;
-    color: #fff;
-  }
 
   .card {
     padding: 0 15px;
@@ -348,6 +364,41 @@ onMounted(() => {
         margin-right: 10px;
         margin-bottom: 10px;
       }
+    }
+  }
+}
+
+.invoice-preview {
+  padding: 20px;
+
+  .title {
+     font-size: 18px;
+     text-align: center;
+  }
+
+  img {
+    width: 100%;
+     margin-top: 10px;
+  }
+
+  .downloadUrl {
+    margin-top: 10px;
+    line-height: 24px;
+
+    a {
+      overflow-wrap: break-word;
+      word-break: break-all;
+      color: #007BFF;
+    }
+  }
+
+  .copyPdfUrl_btn {
+    margin-top: 10px;
+    display: flex;
+    justify-content: space-between;
+
+    div {
+      width: 49%;
     }
   }
 }

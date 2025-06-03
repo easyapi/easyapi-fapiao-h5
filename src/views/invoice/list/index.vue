@@ -5,7 +5,7 @@ import { copyText } from '@/utils/invoice'
 import { getColorByStatements, invoiceTag } from '@/utils/invoice-category'
 import Clipboard from 'clipboard'
 import dayjs from 'dayjs'
-import { showToast } from 'vant'
+import { showDialog, showToast } from 'vant'
 
 const store = useStore()
 const router = useRouter()
@@ -121,7 +121,12 @@ function getWindowHeight() {
   state.windowHeight = clientHeight - 69 - (store.ifShowH5NavBar ? 46 : 0)
 }
 
-function copyLink() {
+function copyLink(text) {
+  showDialog({
+    title: '发票信息',
+    message: `<div class="copy_invoice">${text}<div>`,
+    allowHtml: true,
+  })
   state.ifRouter = false
   const newClipboard = new Clipboard('.copyBtn')
   newClipboard.on('success', () => {
@@ -192,7 +197,7 @@ onMounted(() => {
           </p>
           <p class="record-list_item_bottom_time">
             <span>{{ item.addTime }}</span>
-            <van-button v-if="item.state === 1" class="copyBtn" size="mini" type="primary" data-clipboard-action="copy" :data-clipboard-text="copyText(item)" @click="copyLink">
+            <van-button v-if="item.state === 1" class="copyBtn" size="mini" type="primary" data-clipboard-action="copy" :data-clipboard-text="copyText(item)" @click="copyLink(copyText(item))">
               复制发票信息
             </van-button>
           </p>
@@ -214,6 +219,12 @@ onMounted(() => {
       word-break: break-all;
     }
   }
+}
+
+.copy_invoice {
+  word-break: break-all !important;
+  text-align: left !important;
+  line-height: 24px;
 }
 </style>
 
