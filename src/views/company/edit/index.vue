@@ -175,6 +175,9 @@ onMounted(() => {
             >
               {{ item.name }}
             </li>
+            <li class="searchList-item none-of-them" @click="state.listShow = false">
+              以上都不是，手工填写
+            </li>
           </ul>
         </div>
         <van-field
@@ -243,10 +246,13 @@ onMounted(() => {
       color: #1989FA;
       padding: 10px 0;
       line-height: 24px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
       border-bottom: 1px solid rgba(235, 237, 240, .5);
+    }
+
+    .none-of-them {
+      font-size: 12px;
+      border: none;
+      color: #999;
     }
   }
 
