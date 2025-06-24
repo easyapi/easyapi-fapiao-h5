@@ -226,7 +226,7 @@ onMounted(() => {
         </div>
       </van-cell-group>
 
-      <van-cell-group title="发票详情" inset>
+      <van-cell-group title="开票信息" inset>
         <van-cell>
           <template #title>
             <div>
