@@ -102,13 +102,13 @@ function selectWeiXinCompany() {
             if (invoiceTitleInfo) {
               const target = JSON.parse(invoiceTitleInfo)
               if (target.type === '1') {
-                this.formData.type = '个人'
-                this.formData.purchaserName = target.title
-                this.formData.purchaserTaxpayerNumber = ''
-                this.formData.purchaserAddress = ''
-                this.formData.purchaserPhone = ''
-                this.formData.purchaserBank = ''
-                this.formData.purchaserBankAccount = ''
+                state.formData.type = '个人'
+                state.formData.purchaserName = target.title
+                state.formData.purchaserTaxpayerNumber = ''
+                state.formData.purchaserAddress = ''
+                state.formData.purchaserPhone = ''
+                state.formData.purchaserBank = ''
+                state.formData.purchaserBankAccount = ''
                 return
               }
               state.formData.type = '企业'
