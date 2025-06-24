@@ -4,8 +4,8 @@ import config from '@/api/config'
 import pending from '@/api/pending'
 import ConfirmInvoice from '@/components/pending/ConfirmInvoice.vue'
 import { validEmail, validMobile } from '@/utils/validate'
-import { showToast } from 'vant'
 import wx from 'jweixin-1.6.0'
+import { showToast } from 'vant'
 
 const route = useRoute()
 
@@ -24,7 +24,7 @@ const state = reactive({
     mobile: '',
     email: '',
     remark: '',
-  },
+  } as any,
   company: null as any,
   accessToken: '' as any,
   showConfirm: false,
@@ -102,7 +102,13 @@ function selectWeiXinCompany() {
             if (invoiceTitleInfo) {
               const target = JSON.parse(invoiceTitleInfo)
               if (target.type === '1') {
-                showToast('暂不支持添加个人发票抬头')
+                this.formData.type = '个人'
+                this.formData.purchaserName = target.title
+                this.formData.purchaserTaxpayerNumber = ''
+                this.formData.purchaserAddress = ''
+                this.formData.purchaserPhone = ''
+                this.formData.purchaserBank = ''
+                this.formData.purchaserBankAccount = ''
                 return
               }
               state.formData.type = '企业'
@@ -243,12 +249,16 @@ onMounted(() => {
             </van-radio>
           </van-radio-group>
         </van-cell>
-        <van-field v-if="state.formData.type === '个人'" v-model="state.formData.purchaserName" label="发票抬头"
-          placeholder="请输入姓名或事业单位名称" required />
+        <van-field
+          v-if="state.formData.type === '个人'" v-model="state.formData.purchaserName" label="发票抬头"
+          placeholder="请输入姓名或事业单位名称" required
+        />
         <div v-else>
-          <van-field v-model="state.formData.purchaserName" label="发票抬头" placeholder="发票抬头" required clearable
+          <van-field
+            v-model="state.formData.purchaserName" label="发票抬头" placeholder="发票抬头" required clearable
             @compositionstart="handleCompositionStart" @compositionend="handleCompositionEnd" @input="handleInput"
-            @focus="inputFocus" @blur="inputBlur" @clear="searchCompanyList">
+            @focus="inputFocus" @blur="inputBlur" @clear="searchCompanyList"
+          >
             <template #right-icon>
               <span class="wx-company" @click="selectWeiXinCompany">微信抬头</span>
             </template>
@@ -256,8 +266,10 @@ onMounted(() => {
           <div class="helper" />
           <div v-show="state.listShow && state.searchList.length > 0" class="searchList">
             <ul>
-              <li v-for="(item, index) in state.searchList" :key="index" class="searchList-item"
-                @mousedown="chooseCompany(index)">
+              <li
+                v-for="(item, index) in state.searchList" :key="index" class="searchList-item"
+                @mousedown="chooseCompany(index)"
+              >
                 {{ item.name }}
               </li>
               <li class="searchList-item none-of-them" @click="state.listShow = false">
@@ -265,13 +277,19 @@ onMounted(() => {
               </li>
             </ul>
           </div>
-          <van-field v-model="state.formData.purchaserTaxpayerNumber" label="税号" clearable placeholder="纳税人识别号"
-            required />
-          <van-field v-show="state.isHide" label="更多" right-icon="arrow-down" readonly placeholder="地址、电话、开户行等"
-            @click="purchaserMore" />
+          <van-field
+            v-model="state.formData.purchaserTaxpayerNumber" label="税号" clearable placeholder="纳税人识别号"
+            required
+          />
+          <van-field
+            v-show="state.isHide" label="更多" right-icon="arrow-down" readonly placeholder="地址、电话、开户行等"
+            @click="purchaserMore"
+          />
           <div v-show="state.isShow">
-            <van-field v-model="state.formData.purchaserAddress" label="地址" placeholder="地址" right-icon="arrow-up"
-              clearable @click-right-icon="purchaserMoreHide" />
+            <van-field
+              v-model="state.formData.purchaserAddress" label="地址" placeholder="地址" right-icon="arrow-up"
+              clearable @click-right-icon="purchaserMoreHide"
+            />
             <van-field v-model="state.formData.purchaserPhone" clearable label="电话" placeholder="电话" />
             <van-field v-model="state.formData.purchaserBank" clearable label="开户行" placeholder="开户行" />
             <van-field v-model="state.formData.purchaserBankAccount" clearable label="银行账号" placeholder="银行账号" />
@@ -285,7 +303,7 @@ onMounted(() => {
       </van-cell-group>
 
       <van-cell-group title="备注" inset>
-        <van-field v-model="state.formData.remark" label="备注" rows="1" autosize type="textarea" placeholder="备注" />
+        <van-field v-model="state.formData.remark" label="备注" rows="2" autosize type="textarea" placeholder="备注" />
       </van-cell-group>
 
       <div class="bottom fixed-bottom-bgColor">
