@@ -18,6 +18,8 @@ import mallOrderJd from '@/views/mall-order/jd.vue'
 import mallOrderKuaishou from '@/views/mall-order/kuaishou.vue'
 import mallOrderYouZan from '@/views/mall-order/youzan.vue'
 import outOrder from '@/views/out-order/index.vue'
+import pending from '@/views/pending/index.vue'
+import success from '@/views/pending/success.vue'
 import rule from '@/views/rule.vue'
 import NProgress from 'nprogress'
 // https://router.vuejs.org/zh/
@@ -122,6 +124,16 @@ const routes = [
     path: '/mall-order/youzan',
     name: 'OrderMakeYouZan',
     component: mallOrderYouZan,
+  },
+  {
+    path: '/pending/index',
+    name: 'pending',
+    component: pending,
+  },
+  {
+    path: '/pending/success',
+    name: 'success',
+    component: success,
   },
 ]
 

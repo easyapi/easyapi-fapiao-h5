@@ -1,15 +1,15 @@
-import path from 'node:path'
-import { loadEnv } from 'vite'
 import type { ConfigEnv, UserConfig } from 'vite'
-
-import { visualizer } from 'rollup-plugin-visualizer'
-import Components from 'unplugin-vue-components/vite'
-import AutoImport from 'unplugin-auto-import/vite'
-import { VantResolver } from 'unplugin-vue-components/resolvers'
+import path from 'node:path'
+import legacy from '@vitejs/plugin-legacy'
 
 import vue from '@vitejs/plugin-vue'
-import legacy from '@vitejs/plugin-legacy'
 import vueJsx from '@vitejs/plugin-vue-jsx'
+import { visualizer } from 'rollup-plugin-visualizer'
+import AutoImport from 'unplugin-auto-import/vite'
+
+import { VantResolver } from 'unplugin-vue-components/resolvers'
+import Components from 'unplugin-vue-components/vite'
+import { loadEnv } from 'vite'
 
 export default ({ mode }: ConfigEnv): UserConfig => {
   const root = process.cwd()
@@ -72,7 +72,7 @@ export default ({ mode }: ConfigEnv): UserConfig => {
 
     server: {
       host: true,
-      port: 3000,
+      port: 3001,
     },
   }
 }
