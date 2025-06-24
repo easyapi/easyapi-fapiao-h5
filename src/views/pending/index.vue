@@ -5,6 +5,7 @@ import pending from '@/api/pending'
 import ConfirmInvoice from '@/components/pending/ConfirmInvoice.vue'
 import { validEmail, validMobile } from '@/utils/validate'
 import { showToast } from 'vant'
+import wx from 'jweixin-1.6.0'
 
 const route = useRoute()
 
