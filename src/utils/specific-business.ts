@@ -49,6 +49,14 @@ export function verificationSpecificBusiness(code: string, value: any) {
         stopLoop = true
         break
       }
+      if (item.idType === 201) {
+        const idCardReg = /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|1[0-2])(?:0[1-9]|[12]\d|3[01])\d{3}[0-9X]$/i
+        if (item.idNumber.length !== 18 || !idCardReg.test(item.idNumber)) {
+          showToast(`请输入正确的出行人${index + 1}证件号码`)
+          stopLoop = true
+          break
+        }
+      }
     }
     if (stopLoop)
       return false
