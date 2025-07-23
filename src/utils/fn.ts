@@ -30,8 +30,7 @@ export function transformData(data: any) {
  * 随机生成一个包含数字和字母的几位组合
  */
 export function generateRandomAlphaNumeric(length: any) {
-  const chars
-    = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
   let result = ''
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * chars.length)

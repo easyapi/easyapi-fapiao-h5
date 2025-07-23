@@ -1,9 +1,9 @@
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import { Dialog } from 'vant'
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import { Dialog } from "vant";
 
 import './app.less'
 
