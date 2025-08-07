@@ -62,7 +62,7 @@ export function judgeDivisor(m: any, n: any) {
   let result = ''
   while (m != 0 && !(m in num)) {
     num[m] = i++
-    result += Number.parseInt((m * 10) / n)
+    result += (m * 10) / n
     m = (m * 10) % n
   }
   return m == 0
