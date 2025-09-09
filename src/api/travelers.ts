@@ -1,3 +1,4 @@
+import type { PageResult } from '@/api/typing'
 import { localStorage } from '@/utils/local-storage'
 import request from '@/utils/request'
 
@@ -6,7 +7,7 @@ const travelers = {
    * 获取出行人信息
    * @see https://www.easyapi.com
    */
-  getTravelers(params): Promise<any> {
+  getTravelers(params: any): Promise<any> {
     return request.get('/user/travelers', {
       params: {
         accessToken: localStorage.get('accessToken'),
@@ -30,7 +31,7 @@ const travelers = {
   /**
    * 获取默认参数信息
    */
-  findFieldKeyList(params: any): Promise<ApiResponse> {
+  findFieldKeyList(params: any): Promise<PageResult> {
     params.size = 100
     return request.get(`/setting/find`, {
       params: {
