@@ -1,4 +1,6 @@
 <script setup lang='ts'>
+import Clipboard from 'clipboard'
+import { closeToast, showDialog, showImagePreview, showLoadingToast, showToast } from 'vant'
 import invoice from '@/api/invoice'
 import outOrder from '@/api/out-order'
 import { useStore } from '@/stores'
@@ -6,8 +8,6 @@ import { idTypes, vehicleTypes } from '@/utils/business'
 import { triggerDownload } from '@/utils/download'
 import { copyText } from '@/utils/invoice'
 import { getIconByStatements } from '@/utils/invoice-category'
-import Clipboard from 'clipboard'
-import { closeToast, showDialog, showImagePreview, showLoadingToast, showToast } from 'vant'
 
 const store = useStore()
 const route = useRoute()
@@ -93,7 +93,6 @@ function getInvoiceDetail() {
     closeToast()
     if (res.code === 1) {
       state.invoiceDetail = res.content
-      state.invoiceDetail.downloadUrl = res.content.downloadUrl ? res.content.downloadUrl : res.content.electronicInvoiceUrl
       state.copyInfo = copyText(res.content)
       state.attachList = res.content.invoiceExtends && res.content.invoiceExtends.length > 0 ? res.content.invoiceExtends.filter(item => item.fieldKey === 'attch' && item.fieldValue)[0].fieldValue.split(',') : []
       showIdTypeAndVehicle()

@@ -76,6 +76,13 @@ const invoice = {
       },
     })
   },
+
+  /**
+   * 根据数电发票号码_时间查询发票信息
+   */
+  getInvoiceDetailByAllElectronicInvoiceNumber(allElectronicInvoiceNumber: any, time: any): Promise<any> {
+    return request.get(`/dzfp/${allElectronicInvoiceNumber}_${time}`)
+  },
 }
 
 export default invoice

@@ -1,7 +1,11 @@
-import companyEdit from '@/views/company/edit/index.vue'
+import NProgress from 'nprogress'
 
+// https://router.vuejs.org/zh/
+import { createRouter, createWebHistory } from 'vue-router'
+import companyEdit from '@/views/company/edit/index.vue'
 import companyList from '@/views/company/list/index.vue'
 import error from '@/views/error.vue'
+import fp from '@/views/fp/index.vue'
 // 导入路由组件
 import mian from '@/views/index.vue'
 import invoiceDetail from '@/views/invoice/detail/index.vue'
@@ -19,11 +23,9 @@ import mallOrderKuaishou from '@/views/mall-order/kuaishou.vue'
 import mallOrderYouZan from '@/views/mall-order/youzan.vue'
 import outOrder from '@/views/out-order/index.vue'
 import pending from '@/views/pending/index.vue'
+
 import success from '@/views/pending/success.vue'
 import rule from '@/views/rule.vue'
-import NProgress from 'nprogress'
-// https://router.vuejs.org/zh/
-import { createRouter, createWebHistory } from 'vue-router'
 import 'nprogress/nprogress.css'
 
 NProgress.configure({ showSpinner: true })
@@ -134,6 +136,11 @@ const routes = [
     path: '/pending/success',
     name: 'success',
     component: success,
+  },
+  {
+    path: '/fp/:id',
+    name: 'fp',
+    component: fp,
   },
 ]
 
