@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import customer from '@/api/customer'
-import setting from '@/api/setting'
 
 const props = defineProps({
   invoiceForm: {
@@ -14,13 +13,10 @@ const props = defineProps({
   },
 })
 
-const router = useRouter()
-
 const state = reactive({
   childForm: {
-    mobile: '',
-    email: '',
-    addressId: '',
+    mobile: '' as string,
+    email: '' as string,
   },
   childAddress: {
     name: '',
@@ -28,24 +24,8 @@ const state = reactive({
     address: '',
     phone: '',
     bank: '',
-    addressId: '',
   },
-  ifElectronic: true,
 })
-
-/**
- * 前往地址管理页
- */
-function gotoAddress() {
-  router.push({
-    path: '/address/',
-    name: 'Address',
-    params: {
-      id: state.childAddress ? state.childAddress.addressId : '',
-      from: 'make',
-    },
-  })
-}
 
 /**
  * 获取开票用户信息
@@ -57,26 +37,15 @@ function getCustomer() {
   })
 }
 
-function findSetting() {
-  setting.findSetting({
-    fieldKeys: 'if_shudian_invoice',
-  }).then((res) => {
-    if (res.code === 0) {
-      state.ifElectronic = false
-    }
-  })
-}
-
 onMounted(() => {
   state.childForm = props.invoiceForm
-  findSetting()
   getCustomer()
 })
 </script>
 
 <template>
   <div>
-    <van-cell-group v-if="state.ifElectronic" title="接收方式" inset>
+    <van-cell-group title="接收方式" inset>
       <van-field
         v-if="!props.ifNeedEmail"
         v-model="state.childForm.email"
@@ -102,35 +71,6 @@ onMounted(() => {
         required
       />
     </van-cell-group>
-
-    <van-cell-group v-else title="接收方式" inset>
-      <van-field
-        v-model="state.childAddress.name"
-        right-icon="arrow"
-        label="收件人"
-        readonly
-        @click="gotoAddress"
-      />
-      <van-field
-        v-model="state.childAddress.mobile"
-        label="手机号码"
-        readonly
-      />
-      <van-cell
-        title="邮寄地址"
-        :value="
-          state.childAddress.province
-            + state.childAddress.city
-            + state.childAddress.district
-            + state.childAddress.addr
-        "
-        readonly
-      />
-    </van-cell-group>
-
-    <div v-if="!state.ifElectronic" class="page-part">
-      开票金额不足200元，需支付邮费
-    </div>
   </div>
 </template>
 
