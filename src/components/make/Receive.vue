@@ -18,13 +18,6 @@ const state = reactive({
     mobile: '' as string,
     email: '' as string,
   },
-  childAddress: {
-    name: '',
-    mobile: '',
-    address: '',
-    phone: '',
-    bank: '',
-  },
 })
 
 /**
