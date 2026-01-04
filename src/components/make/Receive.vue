@@ -30,7 +30,7 @@ const state = reactive({
     bank: '',
     addressId: '',
   },
-  ifElectronic: false,
+  ifElectronic: true,
 })
 
 /**
@@ -61,9 +61,8 @@ function findSetting() {
   setting.findSetting({
     fieldKeys: 'if_shudian_invoice',
   }).then((res) => {
-    if (res.code === 1) {
-      if (res.content[0].fieldValue === 'true')
-        state.ifElectronic = true
+    if (res.code === 0) {
+      state.ifElectronic = false
     }
   })
 }
