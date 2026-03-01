@@ -4,16 +4,16 @@ import legacy from '@vitejs/plugin-legacy'
 
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import { visualizer } from 'rollup-plugin-visualizer'
 import AutoImport from 'unplugin-auto-import/vite'
 
 import { VantResolver } from 'unplugin-vue-components/resolvers'
 import Components from 'unplugin-vue-components/vite'
 import { loadEnv } from 'vite'
 
-export default ({ mode }: ConfigEnv): UserConfig => {
+export default async ({ mode }: ConfigEnv): Promise<UserConfig> => {
   const root = process.cwd()
   const env = loadEnv(mode, root)
+  const { visualizer } = await import('rollup-plugin-visualizer')
 
   return {
     base: env.VITE_APP_PUBLIC_PATH,
